@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TPOS</title>
+    <link rel="stylesheet" href="./index.css">
+</head>
+
+<body>
+    <div class="container-main">
+        <!-- 不提供操作按钮 -->
+        <div class="tabs-div default-box">
+            <div class="image-box">
+                <img src="../static/windmill.png" alt="">
+            </div>
+        </div>
+
+        <!-- 自动学习 -->
+        <div class="tabs-div auto-study">
+            <div class="input-box set-target">
+                <span>设定目标</span>
+                <input type="number" name="" id="" value="10" min="0">
+            </div>
+            <div class="input-box float-range">
+                <span>浮动范围</span>
+                <input type="number" name="" id="" value="0" min="0">
+                <span>-</span>
+                <input type="number" name="" id="" value="5" min="0">
+            </div>
+            <div class="input-box all-number">
+                <span>全量序号</span>
+                <input type="number" name="" id="" value="0" min="0">
+            </div>
+            <div class="button-box">
+                <button id="start-study">开始学习</button>
+            </div>
+        </div>
+
+        <!-- 自动考试 -->
+        <div class="tabs-div auto-exam">
+            <div class="button-box">
+                <button id="start-exam">开始考试</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="./index.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,72 @@
+* {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.container-main {
+  padding: 20px 10px 10px;
+  width: 300px;
+  height: 290px;
+}
+.default-box {
+  font-size: 0;
+}
+.default-box .image-box {
+  padding: 0 10px;
+  width: 280px;
+  height: 280px;
+  overflow: hidden;
+}
+.default-box .image-box img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  animation: rotate 2s linear 0s infinite;
+}
+.auto-study {
+  display: none;
+}
+.auto-study .input-box {
+  margin-bottom: 10px;
+}
+.auto-study .input-box span {
+  margin-right: 10px;
+  font-size: 20px;
+  line-height: 24px;
+}
+.auto-study .input-box input {
+  width: 180px;
+  font-size: 24px;
+}
+.auto-study .float-range input {
+  width: 80px;
+}
+.auto-study .button-box {
+  padding-top: 10px;
+  text-align: center;
+}
+.auto-study .button-box button {
+  padding: 0 20px;
+  font-size: 20px;
+  line-height: 28px;
+}
+.auto-exam {
+  display: none;
+  padding: 15px 0;
+}
+.auto-exam .button-box {
+  text-align: center;
+}
+.auto-exam .button-box button {
+  padding: 0 20px;
+  font-size: 20px;
+  line-height: 28px;
+}
+@keyframes rotate {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
