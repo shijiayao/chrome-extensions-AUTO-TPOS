@@ -38,6 +38,12 @@
   width: 180px;
   font-size: 24px;
 }
+.auto-study .select-signup input {
+  width: 24px;
+  height: 24px;
+  font-size: 0;
+  vertical-align: top;
+}
 .auto-study .float-range input {
   width: 80px;
 }

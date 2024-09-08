@@ -6,6 +6,8 @@ const IsCourseList = urlObject.pathname.indexOf('/myTrainingCourseList') > -1; /
 const IsCourseDetail = urlObject.pathname.indexOf('/home/courseDetail') > -1; // 课程详情页
 const IsExamDetail = urlObject.href.indexOf('/exam/examDetail') > -1; // 考试详情页
 
+let allReadArray = []; // 全部看完的
+
 function Sleep(time = 0) {
     return new Promise((resolve, reject) => {
         setTimeout(resolve, time);
@@ -30,11 +32,19 @@ chrome.runtime.onMessage.addListener(async function (request, sender, sendRespon
                 break;
 
             case 'study':
+                allReadArray = [-1];
+
+                if (request.allNumber > 0) {
+                    allReadArray = request.allNumber.toString().split('').map((element) => {
+                        return Number(element) - 1;
+                    });
+                }
+
                 autoStudyClass(
                     injectedJavaScriptCode(
-                        `window.AutoStudyClassExample = new AutoStudyClass({ ratio : ${request.setTarget / 100}, min : ${request.floatRangeMin}, max : ${request.floatRangeMax}, all : [${
-                            request.allNumber <= 0 ? -1 : request.allNumber.split('')
-                        }] });`
+                        `window.AutoStudyClassExample = new AutoStudyClass({ ratio : ${request.setTarget / 100}, min : ${request.floatRangeMin}, max : ${request.floatRangeMax}, includeSignUp : ${
+                            request.includeSignUp
+                        }, all : [${allReadArray}] });`
                     )
                 );
 

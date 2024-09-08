@@ -68,7 +68,7 @@ class AutoStudyClass {
     }
 
     addTags() {
-        document.body.setAttribute('__AUTO__CLASS__TAGS__','__AUTO__CLASS__TAGS__');
+        document.body.setAttribute('__AUTO__CLASS__TAGS__', '__AUTO__CLASS__TAGS__');
     }
 
     async AutoStudy_NewTabsClass() {
@@ -106,8 +106,12 @@ class AutoStudyClass {
 
             // 同步环境
             async syncFn() {
+                if (_this.options.includeSignUp) {
+                    this.listPage();
+                    await _this.Sleep(1500);
+                }
                 this.clickAfoot();
-                await _this.Sleep(2000);
+                await _this.Sleep(1500);
                 this.listPage();
                 this.openDetailList();
             }
@@ -374,4 +378,4 @@ class AutoStudyClass {
     }
 }
 
-// window.AutoStudyClassExample = new AutoStudyClass({ ratio : 0.1, min : 0, max : 5, all : [-1] });
+// window.AutoStudyClassExample = new AutoStudyClass({ ratio : 0.1, min : 0, max : 5, includeSignUp : false, all : [-1] });

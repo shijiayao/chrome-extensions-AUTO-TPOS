@@ -15,6 +15,7 @@ class AutoExam {
         this.answersArray = window.__AUTO_EXAM_ANSWERS_ARRAY__ || [];
 
         this.listensRequests();
+        this.addTags();
         this.startExam();
     }
 
@@ -62,6 +63,10 @@ class AutoExam {
                 handler.next(response);
             }
         });
+    }
+
+    addTags() {
+        document.body.setAttribute('__AUTO__CLASS__TAGS__','__AUTO__CLASS__TAGS__');
     }
 
     /**
