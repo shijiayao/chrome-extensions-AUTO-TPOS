@@ -60,10 +60,30 @@
   display: none;
   padding: 15px 0;
 }
-.auto-exam .button-box {
+.auto-exam .verify-box .input-box {
   text-align: center;
 }
-.auto-exam .button-box button {
+.auto-exam .verify-box .input-box input {
+  margin-bottom: 20px;
+  width: calc(100% - 20px);
+  font-size: 24px;
+}
+.auto-exam .verify-box .button-box {
+  text-align: center;
+}
+.auto-exam .verify-box .button-box button {
+  padding: 0 20px;
+  font-size: 20px;
+  line-height: 28px;
+}
+.auto-exam .select-button-box {
+  display: none;
+}
+.auto-exam .select-button-box .button-box {
+  padding-bottom: 20px;
+  text-align: center;
+}
+.auto-exam .select-button-box .button-box button {
   padding: 0 20px;
   font-size: 20px;
   line-height: 28px;

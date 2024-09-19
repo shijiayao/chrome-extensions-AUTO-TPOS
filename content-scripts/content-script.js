@@ -51,7 +51,7 @@ chrome.runtime.onMessage.addListener(async function (request, sender, sendRespon
                 break;
 
             case 'exam':
-                autoExamClass(injectedJavaScriptCode(`new AutoExam();`));
+                autoExamClass(injectedJavaScriptCode(`new AutoExam({ buttonText: '${request.text}' });`));
                 break;
 
             default:

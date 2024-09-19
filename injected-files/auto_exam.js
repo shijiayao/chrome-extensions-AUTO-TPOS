@@ -13,6 +13,7 @@ class AutoExam {
             J : 9
         };
         this.answersArray = window.__AUTO_EXAM_ANSWERS_ARRAY__ || [];
+        this.buttonText = params.buttonText;
 
         this.listensRequests();
         this.addTags();
@@ -66,15 +67,27 @@ class AutoExam {
     }
 
     addTags() {
-        document.body.setAttribute('__AUTO__CLASS__TAGS__','__AUTO__CLASS__TAGS__');
+        document.body.setAttribute('__AUTO__CLASS__TAGS__', '__AUTO__CLASS__TAGS__');
     }
 
     /**
      * 点击开始答题
      */
     async startExam() {
+        let _this = this;
+
         try {
-            document.querySelector('.exam-btn button').click();
+            [].forEach.call(document.querySelectorAll('.exam-btn button'), (element) => {
+                if (_this.buttonText === '模拟考试') {
+                    if (element.textContent === _this.buttonText) {
+                        element.click();
+                    }
+                } else {
+                    if (element.textContent === '开始考试' || element.textContent === '再考一次') {
+                        element.click();
+                    }
+                }
+            });
         } catch (error) {}
 
         await this.Sleep(1000);
@@ -103,14 +116,14 @@ class AutoExam {
                 _this.autoAnswer();
                 clearInterval(intervalID);
             }
-        }, 2000);
+        }, 200);
     }
 
     /**
      * 自动答题
      */
     async autoAnswer() {
-        await this.Sleep(1888);
+        await this.Sleep(500);
         let examQuestions = document.getElementById('examQuestions');
         let questionTotal = Number(examQuestions.querySelector('.exam-ctrl .question').textContent); // 题目总数
         let questionCurrent = Number(examQuestions.querySelector('.exam-ctrl .current-question').textContent); // 当前题目序号
@@ -123,7 +136,7 @@ class AutoExam {
         for (let index = 0; index < questionCurrentAnswerarray.length; index++) {
             let element = questionCurrentAnswerarray[index];
             questionAnswerOptions[this.optionsMapTable[element]].querySelector('.answer-content').click();
-            await this.Sleep(400);
+            await this.Sleep(200);
         }
 
         if (questionCurrent === questionTotal) {
@@ -133,7 +146,6 @@ class AutoExam {
             this.completeDialog();
         } else {
             // 下一题
-            await this.Sleep(888);
             questionFooterButton[1].click();
             this.autoAnswer();
         }
