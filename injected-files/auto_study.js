@@ -225,6 +225,7 @@ class AutoStudyClass {
         class DetailClass {
             constructor() {
                 this.ratio = _this.ratio;
+                this.nodeTime = 10 * 60 * 1000;
 
                 this.init();
                 this.loopPlay();
@@ -235,30 +236,37 @@ class AutoStudyClass {
                 window.onbeforeunload = () => {};
             }
 
-            async loopPlay() {
-                const loopCount = Math.ceil(this.ratio / 0.2);
-                console.log('loopRatio', this.ratio);
-                console.log('loopCount', loopCount);
-                if (this.ratio >= 1) {
-                    for (let index = 0; index < loopCount; index++) {
-                        console.log('loopIndex', index);
-                        await this.detail({ ratio : 0.2, count : index, isLoop : true });
-                    }
-                } else if (this.ratio > 0.2) {
-                    for (let index = 0; index < loopCount; index++) {
-                        console.log('loopIndex', index);
-                        await this.detail({ ratio : 0.2, count : index, isLoop : true });
-                    }
-                    await this.different();
-                } else {
-                    await this.detail({ ratio : this.ratio, count : 0, isLoop : false });
-                    await this.different();
-                }
+            async playElement(options) {
+                let index = 0;
+                let nodeTime = 10 * 60;
 
-                await this.playOver();
+                while (index < options.planTimeNodeArray.length) {
+                    options.elementDom.querySelector('.course-title').click();
+                    await _this.Sleep(2000);
+
+                    {
+                        const videoElement = document.querySelector('video');
+                        if (videoElement) {
+                            videoElement.addEventListener('loadedmetadata', function () {
+                                videoElement.muted = true;
+
+                                // 视频已加载元数据，可以设置currentTime
+                                if (index > 0) {
+                                    videoElement.currentTime = index * nodeTime;
+                                }
+
+                                videoElement.play();
+                            });
+                        }
+                    }
+
+                    await _this.sleepTime(options.planTimeNodeArray[index]);
+
+                    ++index;
+                }
             }
 
-            async detail(options) {
+            async loopPlay() {
                 const VideoList = document.querySelectorAll('.palyer-course-list > div');
                 for (let index01 = 0; index01 < VideoList.length; index01++) {
                     const pDom = VideoList[index01].querySelectorAll('p');
@@ -266,101 +274,57 @@ class AutoStudyClass {
                     let H = (itemTime.match(/\d*时/) || ['0时'])[0].replace('时', '');
                     let M = (itemTime.match(/\d*分/) || ['0分'])[0].replace('分', '');
                     let S = (itemTime.match(/\d*秒/) || ['0秒'])[0].replace('秒', '');
-                    let loadTime = 0;
                     let totalTime = Number(H) * 60 * 60 * 1000 + (Number(M) + 1) * 60 * 1000 + Number(S) * 1000;
+                    let planTime = 0;
+                    let planTimeNodeArray = [];
+                    let setRatio = this.ratio;
+                    let randomRatio = _this.randomNumber(_this.min, _this.max) / 100;
+                    let completionRatio = 0;
                     if (pDom[1]) {
-                        loadTime = parseInt(pDom[1].innerText.replace('完成度：', ''));
+                        completionRatio = parseInt(pDom[1].innerText.trim().replace('完成度：', '')) / 100;
                     }
-                    let sleepTime = 5000;
-                    if (options.isLoop) {
-                        if (options.ratio * (options.count + 1) <= loadTime / 100) {
-                            sleepTime = 5000;
-                        } else {
-                            sleepTime = totalTime * (options.ratio + 0.01);
-                        }
+                    let sleepTime = 3000;
+
+                    // 完成进度小于设定进度
+                    if (completionRatio < setRatio) {
+                        planTime = (setRatio - completionRatio + randomRatio) * totalTime;
+                    }
+
+                    let nodeNumber = planTime / this.nodeTime; // 时间节点数量
+
+                    if (nodeNumber <= 1) {
+                        planTimeNodeArray.push(planTime);
                     } else {
-                        if (loadTime / 100 >= options.ratio) {
-                            sleepTime = 5000;
-                        } else {
-                            sleepTime = totalTime * (options.ratio - loadTime / 100 + 0.01);
+                        planTimeNodeArray = new Array(Math.floor(nodeNumber)).fill(this.nodeTime);
+                        if (planTime % this.nodeTime !== 0) {
+                            planTimeNodeArray.push(planTime % this.nodeTime);
                         }
                     }
+
                     console.log('index', index01);
                     console.log('H', H, 'M', M, 'S', S);
                     console.log('totalTime', totalTime);
-                    console.log('loadTime', loadTime);
+                    console.log('planTime', planTime);
+                    console.log('planTimeNodeArray', planTimeNodeArray);
+                    console.log('setRatio', setRatio);
+                    console.log('randomRatio', randomRatio);
+                    console.log('completionRatio', completionRatio);
                     console.log('sleepTime', sleepTime);
-                    if (loadTime > 0) {
-                        if (loadTime / (options.count + 1) / 100 >= options.ratio) {
-                            console.log('continue');
-                            await _this.Sleep(1000);
-                            continue;
-                        } else {
-                            VideoList[index01].querySelector('.course-title').click();
-                            await _this.Sleep(2000);
-                            {
-                                const videoElement = document.querySelector('video');
-                                if (videoElement) {
-                                    videoElement.muted = true;
-                                    videoElement.play();
-                                }
-                            }
-                        }
+
+                    if (planTime > 0) {
+                        await playElement({
+                            elementDom        : VideoList[index01],
+                            planTimeNodeArray : planTimeNodeArray
+                        });
                     } else {
-                        VideoList[index01].querySelector('.course-title').click();
-                        await _this.Sleep(2000);
-                        {
-                            const videoElement = document.querySelector('video');
-                            if (videoElement) {
-                                videoElement.muted = true;
-                                videoElement.play();
-                            }
-                        }
+                        await _this.Sleep(sleepTime);
+                        console.log('next');
                     }
-                    await _this.Sleep(sleepTime);
+
                     console.log('loop-' + index01);
                 }
-            }
 
-            async different() {
-                const VideoList = document.querySelectorAll('.palyer-course-list > div');
-                for (let index01 = 0; index01 < VideoList.length; index01++) {
-                    const pDom = VideoList[index01].querySelectorAll('p');
-                    let itemTime = pDom[0].innerText.trim();
-                    let H = (itemTime.match(/\d*时/) || ['0时'])[0].replace('时', '');
-                    let M = (itemTime.match(/\d*分/) || ['0分'])[0].replace('分', '');
-                    let S = (itemTime.match(/\d*秒/) || ['0秒'])[0].replace('秒', '');
-                    let loadTime = 0;
-                    let totalTime = Number(H) * 60 * 60 * 1000 + (Number(M) + 1) * 60 * 1000 + Number(S) * 1000;
-                    let rNumber = _this.randomNumber(_this.min, _this.max);
-                    if (pDom[1]) {
-                        loadTime = parseInt(pDom[1].innerText.replace('完成度：', ''));
-                    }
-                    let sleepTime = 5000;
-                    console.log('different-loadTime', loadTime);
-                    console.log('different-random', rNumber);
-                    if (loadTime / 100 >= this.ratio) {
-                        console.log('different-continue');
-                        continue;
-                    } else {
-                        sleepTime = totalTime * (rNumber / 100);
-
-                        VideoList[index01].querySelector('.course-title').click();
-                        await _this.Sleep(2000);
-                        {
-                            const videoElement = document.querySelector('video');
-                            if (videoElement) {
-                                videoElement.muted = true;
-                                videoElement.play();
-                            }
-                        }
-                    }
-
-                    console.log('different-sleepTime', sleepTime);
-
-                    await _this.Sleep(sleepTime);
-                    console.log('different-loop-' + index01);
-                }
+                await this.playOver();
             }
 
             async playOver() {

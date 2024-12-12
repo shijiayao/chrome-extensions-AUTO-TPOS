@@ -573,7 +573,7 @@ ah.proxy({
             window.__AUTO_EXAM_ANSWERS_ARRAY__ = JSON.parse(response.response)
                 .data.bzdaz.split(',')
                 .map((element) => {
-                    return element.split('');
+                    return element.split(' ').join('').split('');
                 });
         }
         handler.next(response);
