@@ -232,8 +232,8 @@ class AutoStudyClass {
             }
 
             init() {
-                window.onblur = () => {};
-                window.onbeforeunload = () => {};
+                window.onblur = () => { };
+                window.onbeforeunload = () => { };
             }
 
             async playElement(options) {
@@ -247,20 +247,17 @@ class AutoStudyClass {
                     {
                         const videoElement = document.querySelector('video');
                         if (videoElement) {
-                            videoElement.addEventListener('loadedmetadata', function () {
-                                videoElement.muted = true;
-
-                                // 视频已加载元数据，可以设置currentTime
+                            videoElement.addEventListener('play', () => {
                                 if (index > 0) {
                                     videoElement.currentTime = index * nodeTime;
                                 }
-
-                                videoElement.play();
-                            });
+                            }, { once : true });
+                            videoElement.muted = true;
+                            videoElement.play();
                         }
                     }
 
-                    await _this.sleepTime(options.planTimeNodeArray[index]);
+                    await _this.Sleep(options.planTimeNodeArray[index]);
 
                     ++index;
                 }
@@ -287,7 +284,11 @@ class AutoStudyClass {
 
                     // 完成进度小于设定进度
                     if (completionRatio < setRatio) {
-                        planTime = (setRatio - completionRatio + randomRatio) * totalTime;
+                        if (setRatio < 1) {
+                            planTime = (setRatio - completionRatio + randomRatio) * totalTime;
+                        } else {
+                            planTime = (setRatio - completionRatio) * totalTime;
+                        }
                     }
 
                     let nodeNumber = planTime / this.nodeTime; // 时间节点数量
@@ -312,7 +313,7 @@ class AutoStudyClass {
                     console.log('sleepTime', sleepTime);
 
                     if (planTime > 0) {
-                        await playElement({
+                        await this.playElement({
                             elementDom        : VideoList[index01],
                             planTimeNodeArray : planTimeNodeArray
                         });
