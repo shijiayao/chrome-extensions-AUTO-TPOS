@@ -103,13 +103,16 @@ function checkNumber(value) {
 }
 
 function changeUI(url) {
-    const urlObject = new URL(url);
-    const IsID = urlObject.hostname.indexOf('11.33.1.253') > -1;
-    const IsHomePage = urlObject.pathname.indexOf('/homePage') === 0; // 首页
-    const IsFromPage = urlObject.pathname.indexOf('/myClass/fromPage') > -1; // 班级列表页
-    const IsCourseList = urlObject.pathname.indexOf('/myTrainingCourseList') > -1; // 课程列表页
-    const IsCourseDetail = urlObject.pathname.indexOf('/home/courseDetail') > -1; // 课程详情页
-    const IsExamDetail = urlObject.href.indexOf('/exam/examDetail') > -1; // 考试详情页
+    const URLObject = new URL(url);
+    const HrefLowercase = String(URLObject.href).toLowerCase();
+    const PathnameLowercase = String(URLObject.pathname).toLowerCase();
+    const PathnameTargetList = ['/homePage', '/myClass/fromPage', '/myTrainingCourseList', '/home/courseDetail', '/exam/examDetail'].map((element) => element.toLowerCase());
+    const IsID = URLObject.hostname.indexOf('11.33.1.253') > -1;
+    const IsHomePage = PathnameLowercase.indexOf(PathnameTargetList[0]) === 0; // 首页
+    const IsFromPage = PathnameLowercase.indexOf(PathnameTargetList[1]) > -1; // 班级列表页
+    const IsCourseList = PathnameLowercase.indexOf(PathnameTargetList[2]) > -1; // 课程列表页
+    const IsCourseDetail = PathnameLowercase.indexOf(PathnameTargetList[3]) > -1; // 课程详情页
+    const IsExamDetail = HrefLowercase.indexOf(PathnameTargetList[4]) > -1; // 考试详情页
 
     const tabsDiv = document.querySelectorAll('.tabs-div');
 

@@ -165,7 +165,7 @@ class AutoStudyClass {
         class DetailListClass {
             constructor() {
                 this.detailLinkArray = [];
-                this.detailListIndex = 0;
+                this.detailListIndex = -1;
                 this.detailTabsWindow = null;
                 this.bc = null;
                 this.MessageEvent();
@@ -176,35 +176,47 @@ class AutoStudyClass {
             MessageEvent() {
                 _this.bc.addEventListener('message', (event) => {
                     if (event.data === 'detail-complete') {
-                        /* 继续播放下一个 */
-                        ++this.detailListIndex;
-                        if (this.detailListIndex < this.detailLinkArray.length) {
-                            setTimeout(() => {
-                                this.openDetail();
-                            }, 8000);
-                        } else {
-                            /* 所有列表都播放完了 */
-                            _this.bc.postMessage('detail-list-complete');
-                            setTimeout(() => {
-                                window.close();
-                            }, 3000);
-                        }
+                        setTimeout(() => {
+                            this.openDetail();
+                        }, 8000);
                     }
                 });
             }
             /* 详情页列表 */
             detailList() {
                 [].forEach.call(document.querySelectorAll('.content-container ul li a'), (element) => {
-                    this.detailLinkArray.push(element.getAttribute('href'));
+                    this.detailLinkArray.push({ url : element.getAttribute('href'), status : element.querySelector('.status').textContent });
                 });
             }
             /* 打开详情页 */
             openDetail() {
-                const newTabsWindow = window.open(this.detailLinkArray[this.detailListIndex], '_blank');
-                this.detailTabsWindow = newTabsWindow;
-                newTabsWindow.addEventListener('load', () => {
-                    this.injectingCode();
-                });
+                ++this.detailListIndex;
+
+                /* 所有列表都播放完了 */
+                if (this.detailListIndex >= this.detailLinkArray.length) {
+                    _this.bc.postMessage('detail-list-complete');
+                    setTimeout(() => {
+                        window.close();
+                    }, 3000);
+
+                    return;
+                }
+
+                const newTabsURL = this.detailLinkArray[this.detailListIndex].url;
+                const newTabsStatus = this.detailLinkArray[this.detailListIndex].status;
+
+                if (newTabsStatus === '已学习') {
+                    /* 已学习的跳过，继续下一个 */
+                    setTimeout(() => {
+                        this.openDetail();
+                    }, 200);
+                } else {
+                    const newTabsWindow = window.open(newTabsURL, '_blank');
+                    this.detailTabsWindow = newTabsWindow;
+                    newTabsWindow.addEventListener('load', () => {
+                        this.injectingCode();
+                    });
+                }
             }
             /* 注入代码 */
             injectingCode() {
@@ -232,8 +244,8 @@ class AutoStudyClass {
             }
 
             init() {
-                window.onblur = () => { };
-                window.onbeforeunload = () => { };
+                window.onblur = () => {};
+                window.onbeforeunload = () => {};
             }
 
             async playElement(options) {
@@ -247,11 +259,15 @@ class AutoStudyClass {
                     {
                         const videoElement = document.querySelector('video');
                         if (videoElement) {
-                            videoElement.addEventListener('play', () => {
-                                if (index > 0) {
-                                    videoElement.currentTime = index * nodeTime;
-                                }
-                            }, { once : true });
+                            videoElement.addEventListener(
+                                'play',
+                                () => {
+                                    if (index > 0) {
+                                        videoElement.currentTime = index * nodeTime;
+                                    }
+                                },
+                                { once : true }
+                            );
                             videoElement.muted = true;
                             videoElement.play();
                         }
