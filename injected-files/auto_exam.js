@@ -15,7 +15,7 @@ class AutoExam {
         this.answersArray = window.__AUTO_EXAM_ANSWERS_ARRAY__ || [];
         this.buttonText = params.buttonText;
 
-        this.listensRequests();
+        // this.listensRequests(); // 不在需要舰艇请求，直接从实例中获取数据
         this.addTags();
         this.startExam();
     }
@@ -102,6 +102,14 @@ class AutoExam {
     }
 
     /**
+     * 获取答案数据
+     */
+    getAnswers() {
+        const App_Vue = document.getElementById('app').__vue__;
+        this.answersArray = App_Vue.$children[0].examPagerInfo.bzdaz;
+    }
+
+    /**
      * 检查答题 dom
      */
     async checkQuestions() {
@@ -113,6 +121,7 @@ class AutoExam {
             let questionBody = document.querySelector('#examQuestions .question-body');
 
             if (questionBody) {
+                _this.getAnswers();
                 _this.autoAnswer();
                 clearInterval(intervalID);
             }

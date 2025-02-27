@@ -14,9 +14,12 @@ function Sleep(time = 0) {
     });
 }
 
+/**
+ * 不在需要拦截请求，直接在实例中获取数据
 if (IsID && IsExamDetail) {
     ajaxProxyPublic();
 }
+*/
 
 chrome.runtime.onMessage.addListener(async function (request, sender, sendResponse) {
     console.log(request);
@@ -35,9 +38,12 @@ chrome.runtime.onMessage.addListener(async function (request, sender, sendRespon
                 allReadArray = [-1];
 
                 if (request.allNumber > 0) {
-                    allReadArray = request.allNumber.toString().split('').map((element) => {
-                        return Number(element) - 1;
-                    });
+                    allReadArray = request.allNumber
+                        .toString()
+                        .split('')
+                        .map((element) => {
+                            return Number(element) - 1;
+                        });
                 }
 
                 autoStudyClass(

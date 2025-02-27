@@ -12,8 +12,12 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
 
     if (request.address === 'extensions:background') {
         switch (request.action) {
-            case 'password-key':
-                window.extension.passwordKeyVerdict = true;
+            case 'study':
+                window.extension.selectVersion = request.selectVersion;
+                break;
+
+            case 'exam':
+                window.extension.examScoresRadio = request.examScoresRadio;
                 break;
 
             default:

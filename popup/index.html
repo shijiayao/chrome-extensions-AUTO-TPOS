@@ -22,21 +22,26 @@
         <div class="tabs-div auto-study">
             <div class="input-box select-signup">
                 <span>包含报名</span>
-                <input type="checkbox" name="" id="">
+                <input type="checkbox" name="">
             </div>
             <div class="input-box set-target">
                 <span>设定目标</span>
-                <input type="number" name="" id="" value="10" min="0">
+                <input type="number" name="" value="10" min="0">
             </div>
             <div class="input-box float-range">
                 <span>浮动范围</span>
-                <input type="number" name="" id="" value="0" min="0">
-                <span>-</span>
-                <input type="number" name="" id="" value="5" min="0">
+                <input type="number" name="" value="0" min="0">
+                <b class="symbol">-</b>
+                <input type="number" name="" value="5" min="0">
             </div>
             <div class="input-box all-number">
                 <span>全量序号</span>
-                <input type="number" name="" id="" value="0" min="0">
+                <input type="number" name="" value="0" min="0">
+            </div>
+            <div class="input-box select-version">
+                <span>学习方式</span>
+                <label class="select-version"><input type="radio" name="version-radio" value="0" checked><span>极速版</span></label>
+                <label class="select-version"><input type="radio" name="version-radio" value="1"><span>流程版</span></label>
             </div>
             <div class="button-box">
                 <button id="start-study">开始学习</button>
@@ -45,20 +50,23 @@
 
         <!-- 自动考试 -->
         <div class="tabs-div auto-exam">
-            <div class="verify-box">
-                <div class="input-box">
-                    <input type="text" placeholder="请输入 **** ** ** **">
-                </div>
-                <div class="button-box">
-                    <button id="password-key">确定</button>
+            <div class="exam-options">
+                <div class="exam-scores-radio">
+                    <label class="scores-label"><input type="radio" name="scores-radio" value="0" checked><span>全对</span></label>
+                    <label class="scores-label"><input type="radio" name="scores-radio" value="1"><span>错一题</span></label>
+                    <label class="scores-label"><input type="radio" name="scores-radio" value="2"><span>错二题</span></label>
+                    <label class="scores-label"><input type="radio" name="scores-radio" value="3"><span>错三题</span></label>
+                    <label class="scores-label"><input type="radio" name="scores-radio" value="3"><span>错四题</span></label>
+                    <label class="scores-label"><input type="radio" name="scores-radio" value="3"><span>错五题</span></label>
+                    <label class="scores-label"><input type="radio" name="scores-radio" value="6"><span>随机错零到五题</span></label>
                 </div>
             </div>
             <div class="select-button-box">
                 <div class="button-box">
-                    <button id="mock-exam">模拟考试</button>
+                    <button class="exam-button" id="mock-exam">模拟考试</button>
                 </div>
                 <div class="button-box">
-                    <button id="start-exam">开始考试</button>
+                    <button class="exam-button" id="start-exam">开始考试</button>
                 </div>
             </div>
         </div>

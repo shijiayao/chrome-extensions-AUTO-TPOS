@@ -5,16 +5,16 @@
 }
 .container-main {
   padding: 20px 10px 10px;
-  width: 300px;
-  height: 290px;
+  width: 400px;
+  min-height: 290px;
 }
 .default-box {
   font-size: 0;
 }
 .default-box .image-box {
   padding: 0 10px;
-  width: 280px;
-  height: 280px;
+  width: 380px;
+  height: 380px;
   overflow: hidden;
 }
 .default-box .image-box img {
@@ -28,17 +28,34 @@
 }
 .auto-study .input-box {
   margin-bottom: 10px;
+  min-height: 32px;
+  font-size: 0;
 }
 .auto-study .input-box span {
+  display: inline-block;
   margin-right: 10px;
+  padding-top: 4px;
+  width: 100px;
+  height: 24px;
   font-size: 20px;
   line-height: 24px;
+  text-align: right;
+  vertical-align: top;
 }
 .auto-study .input-box input {
   width: 180px;
+  height: 28px;
   font-size: 24px;
 }
+.auto-study .input-box .symbol {
+  display: inline-block;
+  margin: 0 2px;
+  font-size: 20px;
+  line-height: 32px;
+  vertical-align: top;
+}
 .auto-study .select-signup input {
+  margin-top: 4px;
   width: 24px;
   height: 24px;
   font-size: 0;
@@ -46,6 +63,21 @@
 }
 .auto-study .float-range input {
   width: 80px;
+}
+.auto-study .select-version label {
+  display: inline-block;
+  height: 32px;
+  font-size: 20px;
+}
+.auto-study .select-version label input {
+  width: 20px;
+  height: 20px;
+  vertical-align: middle;
+}
+.auto-study .select-version label span {
+  width: auto;
+  margin-left: 2px;
+  vertical-align: top;
 }
 .auto-study .button-box {
   padding-top: 10px;
@@ -60,24 +92,31 @@
   display: none;
   padding: 15px 0;
 }
-.auto-exam .verify-box .input-box {
-  text-align: center;
+.auto-exam .exam-options {
+  padding-bottom: 10px;
 }
-.auto-exam .verify-box .input-box input {
-  margin-bottom: 20px;
-  width: calc(100% - 20px);
-  font-size: 24px;
-}
-.auto-exam .verify-box .button-box {
-  text-align: center;
-}
-.auto-exam .verify-box .button-box button {
+.auto-exam .exam-options .exam-scores-radio {
   padding: 0 20px;
-  font-size: 20px;
-  line-height: 28px;
 }
-.auto-exam .select-button-box {
-  display: none;
+.auto-exam .exam-options .exam-scores-radio .scores-label {
+  display: inline-block;
+  margin-right: 5px;
+  margin-bottom: 5px;
+  height: 32px;
+}
+.auto-exam .exam-options .exam-scores-radio .scores-label input {
+  margin-top: 6px;
+  width: 20px;
+  height: 20px;
+  vertical-align: top;
+}
+.auto-exam .exam-options .exam-scores-radio .scores-label span {
+  display: inline-block;
+  margin-top: 4px;
+  margin-left: 2px;
+  vertical-align: top;
+  font-size: 20px;
+  line-height: 24px;
 }
 .auto-exam .select-button-box .button-box {
   padding-bottom: 20px;

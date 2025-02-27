@@ -6,8 +6,8 @@
 
 .container-main {
     padding: 20px 10px 10px;
-    width: 300px;
-    height: 290px;
+    width: 400px;
+    min-height: 290px;
 }
 
 .default-box {
@@ -15,8 +15,8 @@
 
     .image-box {
         padding: 0 10px;
-        width: 280px;
-        height: 280px;
+        width: 380px;
+        height: 380px;
         overflow: hidden;
 
         img {
@@ -33,21 +33,39 @@
 
     .input-box {
         margin-bottom: 10px;
+        min-height: 32px;
+        font-size: 0;
 
         span {
+            display: inline-block;
             margin-right: 10px;
+            padding-top: 4px;
+            width: 100px;
+            height: 24px;
             font-size: 20px;
             line-height: 24px;
+            text-align: right;
+            vertical-align: top;
         }
 
         input {
             width: 180px;
+            height: 28px;
             font-size: 24px;
+        }
+
+        .symbol {
+            display: inline-block;
+            margin: 0 2px;
+            font-size: 20px;
+            line-height: 32px;
+            vertical-align: top;
         }
     }
 
     .select-signup {
         input {
+            margin-top: 4px;
             width: 24px;
             height: 24px;
             font-size: 0;
@@ -58,6 +76,26 @@
     .float-range {
         input {
             width: 80px;
+        }
+    }
+
+    .select-version {
+        label {
+            display: inline-block;
+            height: 32px;
+            font-size: 20px;
+
+            input {
+                width: 20px;
+                height: 20px;
+                vertical-align: middle;
+            }
+
+            span {
+                width: auto;
+                margin-left: 2px;
+                vertical-align: top;
+            }
         }
     }
 
@@ -77,31 +115,38 @@
     display: none;
     padding: 15px 0;
 
-    .verify-box {
-        .input-box {
-            text-align: center;
+    .exam-options {
+        padding-bottom: 10px;
 
-            input {
-                margin-bottom: 20px;
-                width: calc(100% - 20px);
-                font-size: 24px;
-            }
-        }
+        .exam-scores-radio {
+            padding: 0 20px;
 
-        .button-box {
-            text-align: center;
+            .scores-label {
+                display: inline-block;
+                margin-right: 5px;
+                margin-bottom: 5px;
+                height: 32px;
 
-            button {
-                padding: 0 20px;
-                font-size: 20px;
-                line-height: 28px;
+                input {
+                    margin-top: 6px;
+                    width: 20px;
+                    height: 20px;
+                    vertical-align: top;
+                }
+
+                span {
+                    display: inline-block;
+                    margin-top: 4px;
+                    margin-left: 2px;
+                    vertical-align: top;
+                    font-size: 20px;
+                    line-height: 24px;
+                }
             }
         }
     }
 
     .select-button-box {
-        display: none;
-
         .button-box {
             padding-bottom: 20px;
             text-align: center;

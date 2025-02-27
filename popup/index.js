@@ -1,8 +1,8 @@
 try {
     const BackgroundWidow = chrome.extension.getBackgroundPage();
 
-    if (BackgroundWidow.extension && BackgroundWidow.extension.passwordKeyVerdict) {
-        verifyPasswordKey();
+    if (BackgroundWidow.extension) {
+        setRadio(BackgroundWidow.extension);
     }
 
     chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
@@ -11,6 +11,8 @@ try {
             switch (request.action) {
                 case 'UI':
                     changeUI(request.url);
+                    // changeUI('http://11.33.1.253/exam/examDetail');
+                    // changeUI('http://11.33.1.253/homePage');
                     break;
 
                 default:
@@ -30,15 +32,17 @@ try {
 }
 
 const buttonStartStudy = document.getElementById('start-study');
-const buttonPasswordKey = document.getElementById('password-key');
-const buttonMockExam = document.getElementById('mock-exam');
-const buttonStartExam = document.getElementById('start-exam');
+const buttonExam = document.querySelectorAll('.exam-button');
+
+// changeUI('http://11.33.1.253/exam/examDetail');
+// changeUI('http://11.33.1.253/homePage');
 
 buttonStartStudy.addEventListener('click', () => {
     const selectSignup = document.querySelectorAll('.select-signup input');
     const setTarget = document.querySelectorAll('.set-target input');
     const floatRange = document.querySelectorAll('.float-range input');
     const allNumber = document.querySelectorAll('.all-number input');
+    const selectVersion = document.querySelectorAll('.select-version input[name="version-radio"]:checked');
 
     chrome.tabs.query({ active : true, currentWindow : true }, function (tabs) {
         chrome.tabs.sendMessage(tabs[0].id, {
@@ -48,46 +52,36 @@ buttonStartStudy.addEventListener('click', () => {
             setTarget     : checkNumber(setTarget[0].value),
             floatRangeMin : checkNumber(floatRange[0].value),
             floatRangeMax : checkNumber(floatRange[1].value),
-            allNumber     : checkNumber(allNumber[0].value)
+            allNumber     : checkNumber(allNumber[0].value),
+            selectVersion : checkNumber(selectVersion[0].value)
         });
+    });
+
+    chrome.runtime.sendMessage({
+        address       : 'extensions:background',
+        action        : 'study',
+        selectVersion : checkNumber(selectVersion[0].value)
     });
 });
 
-buttonPasswordKey.addEventListener('click', () => {
-    const passwordKeyInput = document.querySelector('.auto-exam .verify-box .input-box input');
+buttonExam.forEach((button) => {
+    button.addEventListener('click', (event) => {
+        const examScoresRadio = document.querySelectorAll('.exam-scores-radio input[name="scores-radio"]:checked');
+        const text = event.target.textContent;
 
-    const verdict = String(passwordKeyInput.value).slice(0, 10) === timestampSerialize(new Date()).join('').slice(0, 10);
-
-    if (verdict) {
-        verifyPasswordKey();
+        chrome.tabs.query({ active : true, currentWindow : true }, function (tabs) {
+            chrome.tabs.sendMessage(tabs[0].id, {
+                address         : 'extensions:content',
+                action          : 'exam',
+                text            : text,
+                examScoresRadio : checkNumber(examScoresRadio[0].value)
+            });
+        });
 
         chrome.runtime.sendMessage({
-            address : 'extensions:background',
-            action  : 'password-key'
-        });
-    }
-});
-
-buttonMockExam.addEventListener('click', (event) => {
-    const text = event.target.textContent;
-
-    chrome.tabs.query({ active : true, currentWindow : true }, function (tabs) {
-        chrome.tabs.sendMessage(tabs[0].id, {
-            address : 'extensions:content',
-            action  : 'exam',
-            text    : text
-        });
-    });
-});
-
-buttonStartExam.addEventListener('click', (event) => {
-    const text = event.target.textContent;
-
-    chrome.tabs.query({ active : true, currentWindow : true }, function (tabs) {
-        chrome.tabs.sendMessage(tabs[0].id, {
-            address : 'extensions:content',
-            action  : 'exam',
-            text    : text
+            address         : 'extensions:background',
+            action          : 'exam',
+            examScoresRadio : checkNumber(examScoresRadio[0].value)
         });
     });
 });
@@ -133,12 +127,13 @@ function changeUI(url) {
     }
 }
 
-function verifyPasswordKey() {
-    const verifyBox = document.querySelector('.auto-exam .verify-box');
-    const selectButtonBox = document.querySelector('.auto-exam .select-button-box');
-
-    verifyBox.style.display = 'none';
-    selectButtonBox.style.display = 'initial';
+function setRadio(options) {
+    if (options.selectVersion > 0) {
+        document.querySelector(`.select-version input[name="version-radio"][value="${options.selectVersion}"]`).checked = true;
+    }
+    if (options.examScoresRadio > 0) {
+        document.querySelector(`.exam-scores-radio input[name="scores-radio"][value="${options.examScoresRadio}"]`).checked = true;
+    }
 }
 
 function timestampSerialize(timestamp) {

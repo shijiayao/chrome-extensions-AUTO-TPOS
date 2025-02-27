@@ -240,12 +240,17 @@ class AutoStudyClass {
                 this.nodeTime = 10 * 60 * 1000;
 
                 this.init();
-                this.loopPlay();
             }
 
             init() {
                 window.onblur = () => {};
                 window.onbeforeunload = () => {};
+
+                if (1) {
+                    this.loopPlay_TopSpeed();
+                } else {
+                    this.loopPlay();
+                }
             }
 
             async playElement(options) {
@@ -279,6 +284,9 @@ class AutoStudyClass {
                 }
             }
 
+            /**
+             * 正常播放
+             */
             async loopPlay() {
                 const VideoList = document.querySelectorAll('.palyer-course-list > div');
                 for (let index01 = 0; index01 < VideoList.length; index01++) {
@@ -337,6 +345,50 @@ class AutoStudyClass {
                         await _this.Sleep(sleepTime);
                         console.log('next');
                     }
+
+                    console.log('loop-' + index01);
+                }
+
+                await this.playOver();
+            }
+
+            async studyRequest() {
+                const App_Vue = document.getElementById('app').__vue__;
+                const NowDate = new Date().getTime();
+
+                let setRatio = this.ratio;
+                let randomRatio = _this.randomNumber(_this.min, _this.max) / 100;
+                let planRatio = setRatio + randomRatio;
+                let loadTime = 5; // 加载缓冲时间（秒）
+                let xxsc = App_Vue.$children[0].studyRecord.zsc * planRatio + loadTime;
+
+                App_Vue.$children[0].studyRecord.xxkssj = NowDate - xxsc * 1000;
+                App_Vue.$children[0].studyRecord.xxjssj = NowDate;
+                App_Vue.$children[0].xxsc = xxsc;
+
+                App_Vue.$children[0].addStudyRecord();
+            }
+
+            /**
+             * 极速版，直接计算时长发起请求，不在需要播放等待
+             */
+            async loopPlay_TopSpeed() {
+                const VideoList = document.querySelectorAll('.palyer-course-list > div');
+                for (let index01 = 0; index01 < VideoList.length; index01++) {
+                    const pDom = VideoList[index01].querySelectorAll('p');
+                    let setRatio = this.ratio;
+                    let completionRatio = 0;
+                    if (pDom[1]) {
+                        completionRatio = parseInt(pDom[1].innerText.trim().replace('完成度：', '')) / 100;
+                    }
+                    let sleepTime = 3000;
+
+                    // 完成进度小于设定进度
+                    if (completionRatio < setRatio) {
+                        await this.studyRequest();
+                    }
+
+                    await _this.Sleep(sleepTime);
 
                     console.log('loop-' + index01);
                 }
