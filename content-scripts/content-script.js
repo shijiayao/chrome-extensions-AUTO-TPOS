@@ -50,14 +50,14 @@ chrome.runtime.onMessage.addListener(async function (request, sender, sendRespon
                     injectedJavaScriptCode(
                         `window.AutoStudyClassExample = new AutoStudyClass({ ratio : ${request.setTarget / 100}, min : ${request.floatRangeMin}, max : ${request.floatRangeMax}, includeSignUp : ${
                             request.includeSignUp
-                        }, all : [${allReadArray}] });`
+                        }, all : [${allReadArray}], studyVersion: ${request.studyVersion} });`
                     )
                 );
 
                 break;
 
             case 'exam':
-                autoExamClass(injectedJavaScriptCode(`new AutoExam({ buttonText: '${request.text}' });`));
+                autoExamClass(injectedJavaScriptCode(`new AutoExam({ buttonText: '${request.text}', examScores: ${request.examScores} });`));
                 break;
 
             default:

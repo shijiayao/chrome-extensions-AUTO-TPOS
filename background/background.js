@@ -13,11 +13,11 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
     if (request.address === 'extensions:background') {
         switch (request.action) {
             case 'study':
-                window.extension.selectVersion = request.selectVersion;
+                window.extension.studyVersion = request.studyVersion;
                 break;
 
             case 'exam':
-                window.extension.examScoresRadio = request.examScoresRadio;
+                window.extension.examScores = request.examScores;
                 break;
 
             default:

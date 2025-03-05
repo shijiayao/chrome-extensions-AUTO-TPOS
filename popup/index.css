@@ -64,17 +64,17 @@
 .auto-study .float-range input {
   width: 80px;
 }
-.auto-study .select-version label {
+.auto-study .study-version .version-label {
   display: inline-block;
   height: 32px;
   font-size: 20px;
 }
-.auto-study .select-version label input {
+.auto-study .study-version .version-label input {
   width: 20px;
   height: 20px;
   vertical-align: middle;
 }
-.auto-study .select-version label span {
+.auto-study .study-version .version-label span {
   width: auto;
   margin-left: 2px;
   vertical-align: top;
@@ -95,22 +95,22 @@
 .auto-exam .exam-options {
   padding-bottom: 10px;
 }
-.auto-exam .exam-options .exam-scores-radio {
+.auto-exam .exam-options .exam-scores {
   padding: 0 20px;
 }
-.auto-exam .exam-options .exam-scores-radio .scores-label {
+.auto-exam .exam-options .exam-scores .scores-label {
   display: inline-block;
   margin-right: 5px;
   margin-bottom: 5px;
   height: 32px;
 }
-.auto-exam .exam-options .exam-scores-radio .scores-label input {
+.auto-exam .exam-options .exam-scores .scores-label input {
   margin-top: 6px;
   width: 20px;
   height: 20px;
   vertical-align: top;
 }
-.auto-exam .exam-options .exam-scores-radio .scores-label span {
+.auto-exam .exam-options .exam-scores .scores-label span {
   display: inline-block;
   margin-top: 4px;
   margin-left: 2px;

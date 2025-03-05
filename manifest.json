@@ -2,7 +2,7 @@
     "manifest_version": 2,
     "name": "Auto TPOS",
     "description": "Automated learning and automated exams",
-    "version": "2.0",
+    "version": "2.1",
     "background": {
         "scripts": ["/background/background.js"],
         "persistent": true

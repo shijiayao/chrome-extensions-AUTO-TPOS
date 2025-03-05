@@ -14,6 +14,7 @@ class AutoExam {
         };
         this.answersArray = window.__AUTO_EXAM_ANSWERS_ARRAY__ || [];
         this.buttonText = params.buttonText;
+        this.examScores = params.examScores;
 
         // this.listensRequests(); // 不在需要舰艇请求，直接从实例中获取数据
         this.addTags();
@@ -105,8 +106,71 @@ class AutoExam {
      * 获取答案数据
      */
     getAnswers() {
+        const _this = this;
         const App_Vue = document.getElementById('app').__vue__;
-        this.answersArray = App_Vue.$children[0].examPagerInfo.bzdaz;
+        _this.answersArray = App_Vue.$children[0].examPagerInfo.bzdaz.split(',').map((element) => {
+            return element.split(' ').join('').split('');
+        });
+
+        // 根据选项改数据（全对或者错题）
+        const answersArrayLength = _this.answersArray.length;
+        const examScores = _this.examScores;
+        const tempIndexArray = new Array(answersArrayLength).fill().map((_, index) => index);
+        const WrongAnswerIndexArray = [];
+        let switchIndex = (examScores >= 5 ? _this.randomNumber(1, 4) : examScores) - 1;
+
+        while (switchIndex > 0) {
+            --switchIndex;
+            tempIndexArray.sort(() => Math.random() - 0.5);
+            WrongAnswerIndexArray.push(tempIndexArray.splice(0, 1)[0]);
+        }
+
+        WrongAnswerIndexArray.forEach((element) => {
+            let tempAnswers = _this.answersArray[element];
+            let tempAnswer = void 0;
+
+            if (tempAnswers.length === 1) {
+                tempAnswer = tempAnswers[0];
+
+                switch (tempAnswer) {
+                    case 'A':
+                        _this.answersArray[element][0] = 'B';
+                        break;
+
+                    case 'B':
+                        _this.answersArray[element][0] = 'A';
+                        break;
+
+                    default:
+                        _this.answersArray[element][0] = 'ABCD'
+                            .replace(tempAnswer, '')
+                            .split('')
+                            .sort(() => Math.random() - 0.5)[0];
+                        break;
+                }
+            } else if (tempAnswers.length > 1) {
+                _this.answersArray[element].sort(() => Math.random() - 0.5).splice(0, 1);
+                _this.answersArray[element].sort();
+            }
+        });
+    }
+
+    /**
+     * 提交前检测答案数据
+     */
+    checkAnswers() {
+        const _this = this;
+        const App_Vue = document.getElementById('app').__vue__;
+        const selectAnswerArray = App_Vue.$children[0].questionStudentAnswerDataList;
+
+        selectAnswerArray.forEach((element, index) => {
+            let elementString = element instanceof Array ? element.sort().join() : element;
+            let targetString = _this.answersArray.sort().join();
+
+            if (elementString !== targetString) {
+                element = targetString.length > 1 ? targetString.split('') : targetString;
+            }
+        });
     }
 
     /**
@@ -163,8 +227,10 @@ class AutoExam {
     /**
      * 交卷弹窗确认
      */
-    completeDialog() {
+    async completeDialog() {
         try {
+            this.checkAnswers();
+            await this.Sleep(400);
             let dialog = document.querySelector('[role="dialog"].el-message-box__wrapper');
             dialog.querySelectorAll('.el-message-box__btns button')[1].click();
         } catch (error) {}
@@ -215,5 +281,3 @@ class AutoExam {
         };
     }
 }
-
-// new AutoExam();

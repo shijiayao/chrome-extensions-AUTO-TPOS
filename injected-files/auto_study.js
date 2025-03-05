@@ -6,6 +6,7 @@ class AutoStudyClass {
         this.min = options.min || 0;
         this.max = options.max || 0;
         this.all = options.all || [];
+        this.studyVersion = options.studyVersion;
         this.NewTabsClass = null;
         this.DetailListClass = null;
         this.DetailClass = null;
@@ -34,7 +35,7 @@ class AutoStudyClass {
 
     // NewTabsClass 代码字符串
     NewTabsClassCodeString(afootIndex) {
-        return this.constructor.toString() + `;window.AutoStudyClassExample = new AutoStudyClass({ ratio: ${this.all.includes(afootIndex) ? 1 : this.ratio}, min: ${this.min}, max: ${this.max} });`;
+        return this.constructor.toString() + `;window.AutoStudyClassExample = new AutoStudyClass({ ratio: ${this.all.includes(afootIndex) ? 1 : this.ratio}, min: ${this.min}, max: ${this.max}, studyVersion: ${this.studyVersion} });`;
     }
 
     // 检查参数
@@ -246,10 +247,10 @@ class AutoStudyClass {
                 window.onblur = () => {};
                 window.onbeforeunload = () => {};
 
-                if (1) {
+                if (_this.studyVersion === 0) {
                     this.loopPlay_TopSpeed();
                 } else {
-                    this.loopPlay();
+                    this.loopPlay_Process();
                 }
             }
 
@@ -285,9 +286,9 @@ class AutoStudyClass {
             }
 
             /**
-             * 正常播放
+             * 正常流程播放
              */
-            async loopPlay() {
+            async loopPlay_Process() {
                 const VideoList = document.querySelectorAll('.palyer-course-list > div');
                 for (let index01 = 0; index01 < VideoList.length; index01++) {
                     const pDom = VideoList[index01].querySelectorAll('p');
@@ -410,5 +411,3 @@ class AutoStudyClass {
         _this.DetailClass = new DetailClass();
     }
 }
-
-// window.AutoStudyClassExample = new AutoStudyClass({ ratio : 0.1, min : 0, max : 5, includeSignUp : false, all : [-1] });

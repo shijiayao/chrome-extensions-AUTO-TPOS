@@ -12,7 +12,7 @@ try {
                 case 'UI':
                     changeUI(request.url);
                     // changeUI('http://11.33.1.253/exam/examDetail');
-                    // changeUI('http://11.33.1.253/homePage');
+                    changeUI('http://11.33.1.253/homePage');
                     break;
 
                 default:
@@ -35,14 +35,14 @@ const buttonStartStudy = document.getElementById('start-study');
 const buttonExam = document.querySelectorAll('.exam-button');
 
 // changeUI('http://11.33.1.253/exam/examDetail');
-// changeUI('http://11.33.1.253/homePage');
+changeUI('http://11.33.1.253/homePage');
 
 buttonStartStudy.addEventListener('click', () => {
     const selectSignup = document.querySelectorAll('.select-signup input');
     const setTarget = document.querySelectorAll('.set-target input');
     const floatRange = document.querySelectorAll('.float-range input');
     const allNumber = document.querySelectorAll('.all-number input');
-    const selectVersion = document.querySelectorAll('.select-version input[name="version-radio"]:checked');
+    const studyVersion = document.querySelectorAll('.study-version input[name="version-radio"]:checked');
 
     chrome.tabs.query({ active : true, currentWindow : true }, function (tabs) {
         chrome.tabs.sendMessage(tabs[0].id, {
@@ -53,35 +53,35 @@ buttonStartStudy.addEventListener('click', () => {
             floatRangeMin : checkNumber(floatRange[0].value),
             floatRangeMax : checkNumber(floatRange[1].value),
             allNumber     : checkNumber(allNumber[0].value),
-            selectVersion : checkNumber(selectVersion[0].value)
+            studyVersion  : checkNumber(studyVersion[0].value)
         });
     });
 
     chrome.runtime.sendMessage({
-        address       : 'extensions:background',
-        action        : 'study',
-        selectVersion : checkNumber(selectVersion[0].value)
+        address      : 'extensions:background',
+        action       : 'study',
+        studyVersion : checkNumber(studyVersion[0].value)
     });
 });
 
 buttonExam.forEach((button) => {
     button.addEventListener('click', (event) => {
-        const examScoresRadio = document.querySelectorAll('.exam-scores-radio input[name="scores-radio"]:checked');
+        const examScores = document.querySelectorAll('.exam-scores input[name="scores-radio"]:checked');
         const text = event.target.textContent;
 
         chrome.tabs.query({ active : true, currentWindow : true }, function (tabs) {
             chrome.tabs.sendMessage(tabs[0].id, {
-                address         : 'extensions:content',
-                action          : 'exam',
-                text            : text,
-                examScoresRadio : checkNumber(examScoresRadio[0].value)
+                address    : 'extensions:content',
+                action     : 'exam',
+                text       : text,
+                examScores : checkNumber(examScores[0].value)
             });
         });
 
         chrome.runtime.sendMessage({
-            address         : 'extensions:background',
-            action          : 'exam',
-            examScoresRadio : checkNumber(examScoresRadio[0].value)
+            address    : 'extensions:background',
+            action     : 'exam',
+            examScores : checkNumber(examScores[0].value)
         });
     });
 });
@@ -128,11 +128,11 @@ function changeUI(url) {
 }
 
 function setRadio(options) {
-    if (options.selectVersion > 0) {
-        document.querySelector(`.select-version input[name="version-radio"][value="${options.selectVersion}"]`).checked = true;
+    if (options.studyVersion > 0) {
+        // document.querySelector(`.study-version input[name="version-radio"][value="${options.studyVersion}"]`).checked = true;
     }
-    if (options.examScoresRadio > 0) {
-        document.querySelector(`.exam-scores-radio input[name="scores-radio"][value="${options.examScoresRadio}"]`).checked = true;
+    if (options.examScores > 0) {
+        document.querySelector(`.exam-scores input[name="scores-radio"][value="${options.examScores}"]`).checked = true;
     }
 }
 
