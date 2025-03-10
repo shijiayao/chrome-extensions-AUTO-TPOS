@@ -12,7 +12,7 @@ try {
                 case 'UI':
                     changeUI(request.url);
                     // changeUI('http://11.33.1.253/exam/examDetail');
-                    changeUI('http://11.33.1.253/homePage');
+                    // changeUI('http://11.33.1.253/homePage');
                     break;
 
                 default:
@@ -35,7 +35,7 @@ const buttonStartStudy = document.getElementById('start-study');
 const buttonExam = document.querySelectorAll('.exam-button');
 
 // changeUI('http://11.33.1.253/exam/examDetail');
-changeUI('http://11.33.1.253/homePage');
+// changeUI('http://11.33.1.253/homePage');
 
 buttonStartStudy.addEventListener('click', () => {
     const selectSignup = document.querySelectorAll('.select-signup input');

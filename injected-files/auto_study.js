@@ -238,7 +238,7 @@ class AutoStudyClass {
         class DetailClass {
             constructor() {
                 this.ratio = _this.ratio;
-                this.nodeTime = 10 * 60 * 1000;
+                this.nodeTime = 10 * 60 * 1000; // 时间节点，时长 10 分钟，单位毫秒
 
                 this.init();
             }
@@ -248,47 +248,69 @@ class AutoStudyClass {
                 window.onbeforeunload = () => {};
 
                 if (_this.studyVersion === 0) {
-                    this.loopPlay_TopSpeed();
+                    this.CourseList_Iterate_Click_TopSpeed();
                 } else {
-                    this.loopPlay_Process();
+                    this.CourseList_Iterate_Play__Process();
                 }
             }
 
-            async playElement(options) {
+            /**
+             * 正常流程播放版
+             * 设置学习时长数据
+             * 如果不是最后一个视频，则提交学习数据
+             * @param {Object} options
+             */
+            async Process_SetStudyData(options) {
+                const App_Vue = document.getElementById('app').__vue__;
+                const NowDate = new Date().getTime();
+
+                let loadTime = 5; // 加载缓冲时间（秒）
+                let xxsc = options.duration / 1000 + loadTime;
+
+                App_Vue.$children[0].studyRecord.xxkssj = NowDate - xxsc * 1000;
+                App_Vue.$children[0].studyRecord.xxjssj = NowDate;
+                App_Vue.$children[0].xxsc = xxsc;
+
+                if (!options.IsLast) {
+                    App_Vue.$children[0].addStudyRecord();
+                }
+            }
+
+            /**
+             * 正常流程播放版
+             * 播放学习内容，在时间节点处设置学习时长数据
+             * @param {Object} options
+             */
+            async Process_PlayElement(options) {
                 let index = 0;
-                let nodeTime = 10 * 60;
+
+                console.log('Starting Process_PlayElement with options:', options);
+
+                options.elementDom.querySelector('.course-title').click();
+                await _this.Sleep(5000);
+
+                {
+                    const videoElement = document.querySelector('video');
+                    if (videoElement) {
+                        videoElement.muted = true;
+                        videoElement.play();
+                    }
+                }
 
                 while (index < options.planTimeNodeArray.length) {
-                    options.elementDom.querySelector('.course-title').click();
-                    await _this.Sleep(2000);
-
-                    {
-                        const videoElement = document.querySelector('video');
-                        if (videoElement) {
-                            videoElement.addEventListener(
-                                'play',
-                                () => {
-                                    if (index > 0) {
-                                        videoElement.currentTime = index * nodeTime;
-                                    }
-                                },
-                                { once : true }
-                            );
-                            videoElement.muted = true;
-                            videoElement.play();
-                        }
-                    }
-
                     await _this.Sleep(options.planTimeNodeArray[index]);
+
+                    _this.Process_SetStudyData({ duration : options.planTimeNodeArray[index], IsLast : index === options.planTimeNodeArray.length - 1 });
 
                     ++index;
                 }
             }
 
             /**
-             * 正常流程播放
+             * 正常流程播放版
+             * 迭代课程列表，正常播放学习内容
              */
-            async loopPlay_Process() {
+            async CourseList_Iterate_Play__Process() {
                 const VideoList = document.querySelectorAll('.palyer-course-list > div');
                 for (let index01 = 0; index01 < VideoList.length; index01++) {
                     const pDom = VideoList[index01].querySelectorAll('p');
@@ -338,7 +360,7 @@ class AutoStudyClass {
                     console.log('sleepTime', sleepTime);
 
                     if (planTime > 0) {
-                        await this.playElement({
+                        await this.Process_PlayElement({
                             elementDom        : VideoList[index01],
                             planTimeNodeArray : planTimeNodeArray
                         });
@@ -350,10 +372,19 @@ class AutoStudyClass {
                     console.log('loop-' + index01);
                 }
 
+                await _this.Sleep(5000);
+                VideoList[0].querySelector('.course-title').click();
+
                 await this.playOver();
             }
 
-            async studyRequest() {
+            /**
+             * 极速版
+             * 设置学习时长数据
+             * 最后一个视频时，IsLast = true 直接提交学习数据
+             * @param {Object} options
+             */
+            async TopSpeed_SetStudyData(options) {
                 const App_Vue = document.getElementById('app').__vue__;
                 const NowDate = new Date().getTime();
 
@@ -367,13 +398,17 @@ class AutoStudyClass {
                 App_Vue.$children[0].studyRecord.xxjssj = NowDate;
                 App_Vue.$children[0].xxsc = xxsc;
 
-                App_Vue.$children[0].addStudyRecord();
+                if (options.IsLast) {
+                    App_Vue.$children[0].addStudyRecord();
+                }
             }
 
             /**
-             * 极速版，直接计算时长发起请求，不在需要播放等待
+             * 极速版
+             * 迭代课程列表
+             * 不在需要按流程播放学习内容，直接调用 TopSpeed_SetStudyData 设置学习时长数据
              */
-            async loopPlay_TopSpeed() {
+            async CourseList_Iterate_Click_TopSpeed() {
                 const VideoList = document.querySelectorAll('.palyer-course-list > div');
                 for (let index01 = 0; index01 < VideoList.length; index01++) {
                     const pDom = VideoList[index01].querySelectorAll('p');
@@ -382,14 +417,15 @@ class AutoStudyClass {
                     if (pDom[1]) {
                         completionRatio = parseInt(pDom[1].innerText.trim().replace('完成度：', '')) / 100;
                     }
-                    let sleepTime = 3000;
 
                     // 完成进度小于设定进度
                     if (completionRatio < setRatio) {
-                        await this.studyRequest();
+                        VideoList[index01].querySelector('.course-title').click();
+                        await _this.Sleep(10000);
+                        await this.TopSpeed_SetStudyData({ IsLast : index01 === VideoList.length - 1 });
                     }
 
-                    await _this.Sleep(sleepTime);
+                    await _this.Sleep(5000);
 
                     console.log('loop-' + index01);
                 }
@@ -398,8 +434,6 @@ class AutoStudyClass {
             }
 
             async playOver() {
-                const VideoList = document.querySelectorAll('.palyer-course-list > div');
-                VideoList[0].querySelector('.course-title').click();
                 console.log('playOver');
                 await _this.Sleep(5000);
                 _this.bc.postMessage('detail-complete');

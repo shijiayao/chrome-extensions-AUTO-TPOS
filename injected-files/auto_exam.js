@@ -108,7 +108,7 @@ class AutoExam {
     getAnswers() {
         const _this = this;
         const App_Vue = document.getElementById('app').__vue__;
-        _this.answersArray = App_Vue.$children[0].examPagerInfo.bzdaz.split(',').map((element) => {
+        _this.answersArray = App_Vue.$children[0].examPaperInfo.bzdaz.split(',').map((element) => {
             return element.split(' ').join('').split('');
         });
 
@@ -117,7 +117,7 @@ class AutoExam {
         const examScores = _this.examScores;
         const tempIndexArray = new Array(answersArrayLength).fill().map((_, index) => index);
         const WrongAnswerIndexArray = [];
-        let switchIndex = (examScores >= 5 ? _this.randomNumber(1, 4) : examScores) - 1;
+        let switchIndex = examScores >= 5 ? _this.randomNumber(0, 4) : examScores;
 
         while (switchIndex > 0) {
             --switchIndex;
