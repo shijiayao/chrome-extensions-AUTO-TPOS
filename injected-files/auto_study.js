@@ -259,6 +259,8 @@ class AutoStudyClass {
              * 设置学习时长数据
              * 如果不是最后一个视频，则提交学习数据
              * @param {Object} options
+             * @param {Number} options.duration - 学习时长
+             * @param {Boolean} options.IsLast - 是否最后一个视频
              */
             async Process_SetStudyData(options) {
                 const App_Vue = document.getElementById('app').__vue__;
@@ -280,6 +282,8 @@ class AutoStudyClass {
              * 正常流程播放版
              * 播放学习内容，在时间节点处设置学习时长数据
              * @param {Object} options
+             * @param {Object} options.elementDom - 当前视频元素
+             * @param {Array} options.planTimeNodeArray - 计划时间节点数组
              */
             async Process_PlayElement(options) {
                 let index = 0;
@@ -383,6 +387,7 @@ class AutoStudyClass {
              * 设置学习时长数据
              * 最后一个视频时，IsLast = true 直接提交学习数据
              * @param {Object} options
+             * @param {Boolean} options.IsLast - 是否是最后一个视频
              */
             async TopSpeed_SetStudyData(options) {
                 const App_Vue = document.getElementById('app').__vue__;

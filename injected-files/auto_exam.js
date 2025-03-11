@@ -16,18 +16,28 @@ class AutoExam {
         this.buttonText = params.buttonText;
         this.examScores = params.examScores;
 
-        // this.listensRequests(); // 不在需要舰艇请求，直接从实例中获取数据
+        // this.listensRequests(); // 不在需要监听请求，直接从实例中获取数据
         this.addTags();
         this.startExam();
     }
 
+    /**
+     *
+     * @param {number} time 毫秒
+     * @returns {Promise}
+     */
     Sleep(time = 0) {
         return new Promise((resolve, reject) => {
             setTimeout(resolve, time);
         });
     }
 
-    // 生成随机数，范围 min - max
+    /**
+     *
+     * @param {Number} min 最小值，包含 min
+     * @param {Number} max 最大值，包含 max
+     * @returns {Number}
+     */
     randomNumber(min, max) {
         return Math.floor(Math.random() * (max + 1 - min) + min);
     }
