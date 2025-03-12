@@ -33,7 +33,7 @@ class AutoExam {
     }
 
     /**
-     *
+     * 生成随机数
      * @param {Number} min 最小值，包含 min
      * @param {Number} max 最大值，包含 max
      * @returns {Number}
