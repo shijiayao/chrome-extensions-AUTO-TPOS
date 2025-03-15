@@ -304,7 +304,7 @@ class AutoStudyClass {
                 while (index < options.planTimeNodeArray.length) {
                     await _this.Sleep(options.planTimeNodeArray[index]);
 
-                    _this.Process_SetStudyData({ duration : options.planTimeNodeArray[index], IsLast : index === options.planTimeNodeArray.length - 1 });
+                    this.Process_SetStudyData({ duration : options.planTimeNodeArray[index], IsLast : index === options.planTimeNodeArray.length - 1 });
 
                     ++index;
                 }
