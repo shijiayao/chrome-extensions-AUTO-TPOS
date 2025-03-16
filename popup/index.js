@@ -1,18 +1,22 @@
 try {
-    const BackgroundWidow = chrome.extension.getBackgroundPage();
+    /**
+     * 查询当前页面 URL
+     */
+    chrome.tabs.query({ active : true, currentWindow : true }, function (tabs) {
+        const activeTab = tabs[0];
+        const activeTabUrl = activeTab.url;
 
-    if (BackgroundWidow.extension) {
-        setRadio(BackgroundWidow.extension);
-    }
+        changeUI(activeTabUrl);
+    });
 
     chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
         console.log(request);
+
         if (request.address === 'content:extensions') {
             switch (request.action) {
                 case 'UI':
+                    // 内容脚本（content script）查询到当前页面 URL
                     changeUI(request.url);
-                    // changeUI('http://11.33.1.253/exam/examDetail');
-                    // changeUI('http://11.33.1.253/homePage');
                     break;
 
                 default:
@@ -21,6 +25,9 @@ try {
         }
     });
 
+    /**
+     * 发消息通知内容脚本（content script）查询当前页面 URL
+     */
     chrome.tabs.query({ active : true, currentWindow : true }, function (tabs) {
         chrome.tabs.sendMessage(tabs[0].id, {
             address : 'extensions:content',
@@ -33,9 +40,6 @@ try {
 
 const buttonStartStudy = document.getElementById('start-study');
 const buttonExam = document.querySelectorAll('.exam-button');
-
-// changeUI('http://11.33.1.253/exam/examDetail');
-// changeUI('http://11.33.1.253/homePage');
 
 buttonStartStudy.addEventListener('click', () => {
     const selectSignup = document.querySelectorAll('.select-signup input');
@@ -127,6 +131,10 @@ function changeUI(url) {
     }
 }
 
+/**
+ * 根据参数设置选项
+ * @param {object} options
+ */
 function setRadio(options) {
     if (options.studyVersion > 0) {
         // document.querySelector(`.study-version input[name="version-radio"][value="${options.studyVersion}"]`).checked = true;

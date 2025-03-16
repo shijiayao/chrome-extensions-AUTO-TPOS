@@ -1,24 +1,40 @@
 {
-    "manifest_version": 2,
+    "manifest_version": 3,
     "name": "Auto TPOS",
     "description": "Automated learning and automated exams",
-    "version": "2.1.1",
+    "version": "3.0.0",
     "background": {
-        "scripts": ["/background/background.js"],
-        "persistent": true
+        "service_worker": "/background/service_worker.js"
     },
-    "content_scripts": [{ "matches": ["*://*/*"], "run_at": "document_idle", "js": ["/content-scripts/content-script.js"] }],
+    "content_scripts": [
+       {
+            "matches": ["*://*/*"],
+            "css": [],
+            "js": ["/content-scripts/content-script.js"],
+            "run_at": "document_idle",
+            "world": "ISOLATED"
+        },
+        {
+            "matches": ["*://*/*"],
+            "css": [],
+            "js": ["/content-scripts/content-script.start-world-MAIN.js"],
+            "run_at": "document_idle",
+            "world": "MAIN"
+        }
+    ],
+    "content_security_policy": {
+        "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self';"
+    },
     "permissions": ["tabs", "storage", "activeTab"],
     "host_permissions": ["http://*/*", "https://*/*"],
-    "web_accessible_resources": ["*://*/*", "**", "**/**.js"],
-    "browser_action": {
-        "default_popup": "/popup/index.html",
-        "default_icon": {
-            "16": "/static/images/default_icon/16.png",
-            "32": "/static/images/default_icon/32.png",
-            "48": "/static/images/default_icon/48.png",
-            "128": "/static/images/default_icon/128.png"
+    "web_accessible_resources": [
+        {
+            "resources": ["**", "**/**.js"],
+            "matches": ["*://*/*"]
         }
+    ],
+    "action": {
+        "default_popup": "/popup/index.html"
     },
     "icons": {
         "16": "/static/images/default_icon/16.png",

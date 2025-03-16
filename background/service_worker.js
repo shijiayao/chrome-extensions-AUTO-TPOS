@@ -1,9 +1,6 @@
 /**
  * 扩展后台脚本
- * 在扩展页面执行
  */
-
-window.extension = {};
 
 console.log('扩展后台脚本 background.js');
 
@@ -13,11 +10,11 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
     if (request.address === 'extensions:background') {
         switch (request.action) {
             case 'study':
-                window.extension.studyVersion = request.studyVersion;
+                console.log(request.studyVersion);
                 break;
 
             case 'exam':
-                window.extension.examScores = request.examScores;
+                console.log(request.examScores);
                 break;
 
             default:
@@ -25,6 +22,3 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
         }
     }
 });
-
-// https://developer.chrome.com/docs/extensions/mv2/messaging?hl=zh-cn
-// https://developer.chrome.com/docs/extensions/mv2/reference?hl=zh-cn

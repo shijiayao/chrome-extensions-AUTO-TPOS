@@ -33,9 +33,19 @@ class AutoStudyClass {
         this.bc = new BroadcastChannel('auto-play');
     }
 
-    // NewTabsClass 代码字符串
-    NewTabsClassCodeString(afootIndex) {
-        return this.constructor.toString() + `;window.AutoStudyClassExample = new AutoStudyClass({ ratio: ${this.all.includes(afootIndex) ? 1 : this.ratio}, min: ${this.min}, max: ${this.max}, studyVersion: ${this.studyVersion} });`;
+    // Class 代码字符串
+    ClassToCodeString() {
+        return this.constructor.toString();
+    }
+
+    // NewClass 代码字符串
+    NewClassToCodeString(afootIndex) {
+        return `;window.AutoStudyClassExample = new AutoStudyClass(${JSON.stringify({
+            ratio        : this.all.includes(afootIndex) ? 1 : this.ratio,
+            min          : this.min,
+            max          : this.max,
+            studyVersion : this.studyVersion
+        })});`;
     }
 
     // 检查参数
@@ -46,16 +56,18 @@ class AutoStudyClass {
     }
 
     guide() {
-        if (location.pathname.indexOf('/homePage') === 0) {
+        const PathnameLowercase = String(location.pathname).toLowerCase();
+
+        if (PathnameLowercase.indexOf('/homePage'.toLowerCase()) === 0) {
             // 首页
             this.homePage();
-        } else if (location.pathname.indexOf('/myClass/fromPage') > -1) {
+        } else if (PathnameLowercase.indexOf('/myClass/fromPage'.toLowerCase()) > -1) {
             //  进行中的列表
             this.AutoStudy_NewTabsClass();
-        } else if (location.pathname.indexOf('/myTrainingCourseList') > -1) {
+        } else if (PathnameLowercase.indexOf('/myTrainingCourseList'.toLowerCase()) > -1) {
             // 详情列表页
             this.AutoStudy_DetailListClass();
-        } else if (location.pathname.indexOf('/home/courseDetail') > -1) {
+        } else if (PathnameLowercase.indexOf('/home/courseDetail'.toLowerCase()) > -1) {
             // 详情页
             this.AutoStudy_DetailClass();
         }
@@ -147,12 +159,20 @@ class AutoStudyClass {
 
             // 注入代码
             injectingCode() {
-                const scriptElement = this.detailListTabsWindow.document.createElement('script');
-
-                this.detailListTabsWindow.document.body.appendChild(scriptElement);
+                // Class 代码字符串
+                const scriptElement_Class = this.detailListTabsWindow.document.createElement('script');
+                this.detailListTabsWindow.document.body.appendChild(scriptElement_Class);
 
                 setTimeout(() => {
-                    scriptElement.appendChild(document.createTextNode(_this.NewTabsClassCodeString(this.afootIndex)));
+                    scriptElement_Class.appendChild(document.createTextNode(_this.ClassToCodeString()));
+                }, 3000);
+
+                // NewClass 代码字符串
+                const scriptElement_NewClass = this.detailListTabsWindow.document.createElement('script');
+                this.detailListTabsWindow.document.body.appendChild(scriptElement_NewClass);
+
+                setTimeout(() => {
+                    scriptElement_NewClass.appendChild(document.createTextNode(_this.NewClassToCodeString(this.afootIndex)));
                 }, 5000);
             }
         }
@@ -219,12 +239,21 @@ class AutoStudyClass {
                     });
                 }
             }
+
             /* 注入代码 */
             injectingCode() {
-                const scriptElement = this.detailTabsWindow.document.createElement('script');
-                this.detailTabsWindow.document.body.appendChild(scriptElement);
+                // Class 代码字符串
+                const scriptElement_Class = this.detailTabsWindow.document.createElement('script');
+                this.detailTabsWindow.document.body.appendChild(scriptElement_Class);
                 setTimeout(() => {
-                    scriptElement.appendChild(document.createTextNode(_this.NewTabsClassCodeString()));
+                    scriptElement_Class.appendChild(document.createTextNode(_this.ClassToCodeString()));
+                }, 5000);
+
+                // NewClass 代码字符串
+                const scriptElement_NewClass = this.detailTabsWindow.document.createElement('script');
+                this.detailTabsWindow.document.body.appendChild(scriptElement_NewClass);
+                setTimeout(() => {
+                    scriptElement_NewClass.appendChild(document.createTextNode(_this.NewClassToCodeString()));
                 }, 5000);
             }
         }
