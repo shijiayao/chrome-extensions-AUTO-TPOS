@@ -2,7 +2,8 @@ const URLObject = new URL(location.href);
 const HrefLowercase = String(URLObject.href).toLowerCase();
 const PathnameLowercase = String(URLObject.pathname).toLowerCase();
 const PathnameTargetList = ['/homePage', '/myClass/fromPage', '/myTrainingCourseList', '/home/courseDetail', '/exam/examDetail'].map((element) => element.toLowerCase());
-const IsID = URLObject.hostname.indexOf('11.33.1.253') > -1;
+const IsOnlineSchools = URLObject.hostname.indexOf('11.33.1.253') > -1; // 网校
+const IsViolationStatistics = URLObject.hostname.indexOf('10.126.26.156') > -1; // 违法数据
 const IsHomePage = PathnameLowercase.indexOf(PathnameTargetList[0]) === 0; // 首页
 const IsFromPage = PathnameLowercase.indexOf(PathnameTargetList[1]) > -1; // 班级列表页
 const IsCourseList = PathnameLowercase.indexOf(PathnameTargetList[2]) > -1; // 课程列表页
@@ -26,7 +27,7 @@ function Sleep(time = 0) {
 
 /**
  * 不在需要拦截请求，直接在实例中获取数据
-if (IsID && IsExamDetail) {
+if (IsOnlineSchools && IsExamDetail) {
     InjectFilesIntoThePage({ stringParam : [], scriptFiles : [LocalInjectFiles.ajax_proxy] });
 }
  */
@@ -68,9 +69,7 @@ chrome.runtime.onMessage.addListener(async function (request, sender, sendRespon
                         }
                     ],
                     scriptFiles : [LocalInjectFiles.auto_study, LocalInjectFiles.auto_example],
-                    callback    : () => {
-                        console.log(666);
-                    }
+                    callback    : () => {}
                 });
                 break;
 
@@ -78,9 +77,15 @@ chrome.runtime.onMessage.addListener(async function (request, sender, sendRespon
                 InjectFilesIntoThePage({
                     stringParam : [{ buttonText : request.text, examScores : request.examScores }],
                     scriptFiles : [LocalInjectFiles.auto_exam, LocalInjectFiles.auto_example],
-                    callback    : () => {
-                        console.log(777);
-                    }
+                    callback    : () => {}
+                });
+                break;
+
+            case 'ViolationStatistics':
+                InjectFilesIntoThePage({
+                    stringParam : [{}],
+                    scriptFiles : [LocalInjectFiles.auto_example],
+                    callback    : () => {}
                 });
                 break;
 

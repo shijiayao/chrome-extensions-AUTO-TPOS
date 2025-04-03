@@ -1,23 +1,30 @@
 {
     "manifest_version": 3,
     "name": "Auto TPOS",
-    "description": "Automated learning and automated exams",
-    "version": "3.0.0",
+    "description": "Automatically learn and take exams in online schools, and automatically collect data on the illegal data statistics page.",
+    "version": "3.1.0",
     "background": {
         "service_worker": "/background/service_worker.js"
     },
     "content_scripts": [
-       {
+        {
             "matches": ["*://*/*"],
             "css": [],
-            "js": ["/content-scripts/content-script.js"],
+            "js": ["/content-scripts/ISOLATED/content-script.js"],
             "run_at": "document_idle",
             "world": "ISOLATED"
         },
         {
             "matches": ["*://*/*"],
             "css": [],
-            "js": ["/content-scripts/content-script.start-world-MAIN.js"],
+            "js": ["/content-scripts/MAIN/content-script-window.js"],
+            "run_at": "document_idle",
+            "world": "MAIN"
+        },
+        {
+            "matches": ["*://11.33.1.253/*"],
+            "css": ["/content-scripts/MAIN/content-script-stats.css"],
+            "js": ["/content-scripts/MAIN/content-script-stats.js"],
             "run_at": "document_idle",
             "world": "MAIN"
         }

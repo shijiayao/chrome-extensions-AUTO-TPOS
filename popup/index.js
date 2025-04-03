@@ -40,7 +40,7 @@ try {
 
 const buttonStartStudy = document.getElementById('start-study');
 const buttonExam = document.querySelectorAll('.exam-button');
-
+const buttonViolationStatistics = document.getElementById('violation-statistics-button');
 buttonStartStudy.addEventListener('click', () => {
     const selectSignup = document.querySelectorAll('.select-signup input');
     const setTarget = document.querySelectorAll('.set-target input');
@@ -62,7 +62,7 @@ buttonStartStudy.addEventListener('click', () => {
     });
 
     chrome.runtime.sendMessage({
-        address      : 'extensions:background',
+        address      : 'extensions:background/service_worker',
         action       : 'study',
         studyVersion : checkNumber(studyVersion[0].value)
     });
@@ -83,10 +83,24 @@ buttonExam.forEach((button) => {
         });
 
         chrome.runtime.sendMessage({
-            address    : 'extensions:background',
+            address    : 'extensions:background/service_worker',
             action     : 'exam',
             examScores : checkNumber(examScores[0].value)
         });
+    });
+});
+
+buttonViolationStatistics.addEventListener('click', () => {
+    chrome.tabs.query({ active : true, currentWindow : true }, function (tabs) {
+        chrome.tabs.sendMessage(tabs[0].id, {
+            address : 'extensions:content',
+            action  : 'ViolationStatistics'
+        });
+    });
+
+    chrome.runtime.sendMessage({
+        address : 'extensions:background/service_worker',
+        action  : 'ViolationStatistics'
     });
 });
 
@@ -105,7 +119,8 @@ function changeUI(url) {
     const HrefLowercase = String(URLObject.href).toLowerCase();
     const PathnameLowercase = String(URLObject.pathname).toLowerCase();
     const PathnameTargetList = ['/homePage', '/myClass/fromPage', '/myTrainingCourseList', '/home/courseDetail', '/exam/examDetail'].map((element) => element.toLowerCase());
-    const IsID = URLObject.hostname.indexOf('11.33.1.253') > -1;
+    const IsOnlineSchools = URLObject.hostname.indexOf('11.33.1.253') > -1; // 网校
+    const IsViolationStatistics = URLObject.hostname.indexOf('10.126.26.156') > -1; // 违法数据
     const IsHomePage = PathnameLowercase.indexOf(PathnameTargetList[0]) === 0; // 首页
     const IsFromPage = PathnameLowercase.indexOf(PathnameTargetList[1]) > -1; // 班级列表页
     const IsCourseList = PathnameLowercase.indexOf(PathnameTargetList[2]) > -1; // 课程列表页
@@ -114,20 +129,28 @@ function changeUI(url) {
 
     const tabsDiv = document.querySelectorAll('.tabs-div');
 
-    if (IsID) {
+    if (IsViolationStatistics) {
+        tabsDiv[0].style.display = 'none';
+        tabsDiv[1].style.display = 'none';
+        tabsDiv[2].style.display = 'none';
+        tabsDiv[3].style.display = 'initial';
+    } else if (IsOnlineSchools) {
         if (IsHomePage || IsFromPage || IsCourseList || IsCourseDetail) {
             tabsDiv[0].style.display = 'none';
             tabsDiv[1].style.display = 'initial';
             tabsDiv[2].style.display = 'none';
+            tabsDiv[3].style.display = 'none';
         } else if (IsExamDetail) {
             tabsDiv[0].style.display = 'none';
             tabsDiv[1].style.display = 'none';
             tabsDiv[2].style.display = 'initial';
+            tabsDiv[3].style.display = 'none';
         }
     } else {
         tabsDiv[0].style.display = 'initial';
         tabsDiv[1].style.display = 'none';
         tabsDiv[2].style.display = 'none';
+        tabsDiv[3].style.display = 'none';
     }
 }
 

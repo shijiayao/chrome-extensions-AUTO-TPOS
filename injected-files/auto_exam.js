@@ -101,7 +101,7 @@ class AutoExam {
             });
         } catch (error) {}
 
-        await this.Sleep(1000);
+        await this.Sleep(8000);
 
         try {
             document.querySelector('.el-dialog__wrapper .el-dialog__body .el-button').click();
