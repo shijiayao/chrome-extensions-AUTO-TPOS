@@ -74,9 +74,9 @@ class AutoStudyClass {
     }
 
     async homePage() {
-        await this.Sleep(1000);
+        await this.Sleep(3000);
         document.querySelector('a[href="/myClass/fromPage"] .HomePage07').click();
-        await this.Sleep(1000);
+        await this.Sleep(5000);
         this.guide();
     }
 
@@ -120,11 +120,12 @@ class AutoStudyClass {
             // 同步环境
             async syncFn() {
                 if (_this.options.includeSignUp) {
+                    await _this.Sleep(3000);
                     this.listPage();
-                    await _this.Sleep(1500);
+                    await _this.Sleep(2000);
                 }
                 this.clickAfoot();
-                await _this.Sleep(1500);
+                await _this.Sleep(5000);
                 this.listPage();
                 this.openDetailList();
             }

@@ -22,7 +22,7 @@
             "world": "MAIN"
         },
         {
-            "matches": ["*://11.33.1.253/*"],
+            "matches": ["*://10.126.26.156:*/*"],
             "css": ["/content-scripts/MAIN/content-script-stats.css"],
             "js": ["/content-scripts/MAIN/content-script-stats.js"],
             "run_at": "document_idle",
