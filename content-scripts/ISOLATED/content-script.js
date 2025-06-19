@@ -11,10 +11,12 @@ const IsCourseDetail = PathnameLowercase.indexOf(PathnameTargetList[3]) > -1; //
 const IsExamDetail = HrefLowercase.indexOf(PathnameTargetList[4]) > -1; // 考试详情页
 
 const LocalInjectFiles = {
+    auto_example : '/injected-files/auto_example.js',
     ajax_proxy   : '/injected-files/ajax_proxy.js',
     auto_exam    : '/injected-files/auto_exam.js',
-    auto_example : '/injected-files/auto_example.js',
-    auto_study   : '/injected-files/auto_study.js'
+    auto_study   : '/injected-files/auto_study.js',
+    stats_js     : '/injected-files/stats/stats.js',
+    stats_css    : '/injected-files/stats/stats.css'
 };
 
 let allReadArray = []; // 全部看完的
@@ -81,10 +83,19 @@ chrome.runtime.onMessage.addListener(async function (request, sender, sendRespon
                 });
                 break;
 
-            case 'ViolationStatistics':
+            case 'ViolationStatisticsMonthly':
                 InjectFilesIntoThePage({
-                    stringParam : [{}],
+                    stringParam : [{ buttonTag : request.action }],
                     scriptFiles : [LocalInjectFiles.auto_example],
+                    callback    : () => {}
+                });
+                break;
+
+            case 'ViolationStatisticsCustomize':
+                InjectFilesIntoThePage({
+                    stringParam : [{ buttonTag : request.action }],
+                    scriptFiles : [LocalInjectFiles.stats_js, LocalInjectFiles.auto_example],
+                    styleFiles  : [LocalInjectFiles.stats_css],
                     callback    : () => {}
                 });
                 break;
@@ -116,7 +127,7 @@ function InjectParamDomIntoThePage(param) {
     return injectedScriptDOM;
 }
 
-function RuntimeGetURLInjectedFiles(filePath) {
+function RuntimeGetURLInjectedFiles_Script(filePath) {
     let injectedFiles = chrome.runtime.getURL(filePath);
     let injectedScriptDOM = document.createElement('script');
     injectedScriptDOM.async = false;
@@ -129,7 +140,20 @@ function RuntimeGetURLInjectedFiles(filePath) {
     });
 }
 
-async function InjectFilesIntoThePage({ stringParam = [], scriptFiles = [], callback = () => {} } = {}) {
+function RuntimeGetURLInjectedFiles_Style(filePath) {
+    let injectedFiles = chrome.runtime.getURL(filePath);
+    let injectedLinkDOM = document.createElement('link');
+    injectedLinkDOM.rel = 'stylesheet';
+    injectedLinkDOM.href = injectedFiles;
+
+    document.head.appendChild(injectedLinkDOM);
+
+    return new Promise((resolve, reject) => {
+        injectedLinkDOM.addEventListener('load', resolve);
+    });
+}
+
+async function InjectFilesIntoThePage({ stringParam = [], scriptFiles = [], styleFiles = [], callback = () => {} } = {}) {
     if (checkTags()) return;
 
     const PromiseArray = [];
@@ -140,8 +164,12 @@ async function InjectFilesIntoThePage({ stringParam = [], scriptFiles = [], call
 
     await Sleep(2000);
 
+    styleFiles.forEach((element) => {
+        PromiseArray.push(RuntimeGetURLInjectedFiles_Style(element));
+    });
+
     scriptFiles.forEach((element) => {
-        PromiseArray.push(RuntimeGetURLInjectedFiles(element));
+        PromiseArray.push(RuntimeGetURLInjectedFiles_Script(element));
     });
 
     Promise.all(PromiseArray).then(callback);

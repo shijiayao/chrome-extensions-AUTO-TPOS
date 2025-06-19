@@ -131,10 +131,11 @@
   display: none;
 }
 .violation-statistics .violation-statistics-box {
-  padding-top: 100px;
+  padding-top: 20px;
   text-align: center;
 }
 .violation-statistics .violation-statistics-box button {
+  margin-top: 40px;
   padding: 0 20px;
   font-size: 20px;
   line-height: 28px;

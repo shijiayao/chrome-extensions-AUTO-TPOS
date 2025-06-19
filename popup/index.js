@@ -38,9 +38,13 @@ try {
     console.log(error);
 }
 
+changeUI('http://10.126.26.156');
+
 const buttonStartStudy = document.getElementById('start-study');
 const buttonExam = document.querySelectorAll('.exam-button');
-const buttonViolationStatistics = document.getElementById('violation-statistics-button');
+const buttonViolationStatisticsMonthly = document.getElementById('violation-statistics-button-monthly');
+const buttonViolationStatisticsCustomize = document.getElementById('violation-statistics-button-customize');
+
 buttonStartStudy.addEventListener('click', () => {
     const selectSignup = document.querySelectorAll('.select-signup input');
     const setTarget = document.querySelectorAll('.set-target input');
@@ -90,17 +94,31 @@ buttonExam.forEach((button) => {
     });
 });
 
-buttonViolationStatistics.addEventListener('click', () => {
+buttonViolationStatisticsMonthly.addEventListener('click', () => {
     chrome.tabs.query({ active : true, currentWindow : true }, function (tabs) {
         chrome.tabs.sendMessage(tabs[0].id, {
             address : 'extensions:content',
-            action  : 'ViolationStatistics'
+            action  : 'ViolationStatisticsMonthly'
         });
     });
 
     chrome.runtime.sendMessage({
         address : 'extensions:background/service_worker',
-        action  : 'ViolationStatistics'
+        action  : 'ViolationStatisticsMonthly'
+    });
+});
+
+buttonViolationStatisticsCustomize.addEventListener('click', () => {
+    chrome.tabs.query({ active : true, currentWindow : true }, function (tabs) {
+        chrome.tabs.sendMessage(tabs[0].id, {
+            address : 'extensions:content',
+            action  : 'ViolationStatisticsCustomize'
+        });
+    });
+
+    chrome.runtime.sendMessage({
+        address : 'extensions:background/service_worker',
+        action  : 'ViolationStatisticsCustomize'
     });
 });
 

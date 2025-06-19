@@ -1,0 +1,177 @@
+#dialog-container {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  z-index: 50000;
+}
+#dialog-container .dialog-main {
+  padding: 30px;
+  height: calc(100% - 60px);
+}
+#dialog-container .dialog-main .dialog-close {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  width: 26px;
+  height: 26px;
+  cursor: pointer;
+  transform: rotate(45deg);
+  border: 1px solid #eee;
+  border-radius: 50%;
+}
+#dialog-container .dialog-main .dialog-close::before,
+#dialog-container .dialog-main .dialog-close::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: red;
+}
+#dialog-container .dialog-main .dialog-close::before {
+  width: 2px;
+  height: 24px;
+}
+#dialog-container .dialog-main .dialog-close::after {
+  width: 24px;
+  height: 2px;
+}
+#dialog-container .dialog-main .dialog-content {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  padding-top: 70px;
+  width: 100%;
+  height: 100%;
+  background-color: #fff;
+  font-size: 0;
+  box-sizing: border-box;
+}
+#dialog-container .dialog-main .dialog-content .dialog-night-box {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 60px;
+}
+#dialog-container .dialog-main .dialog-content .dialog-night-box .float-left {
+  float: left;
+  display: grid;
+  place-items: center;
+  width: 200px;
+  height: 60px;
+}
+#dialog-container .dialog-main .dialog-content .dialog-night-box .float-left #dialog-night-button {
+  font-size: 16px;
+}
+#dialog-container .dialog-main .dialog-content .dialog-night-box .overflow-hidden-right {
+  overflow: hidden;
+  display: flex;
+  flex-wrap: wrap;
+}
+#dialog-container .dialog-main .dialog-content .dialog-night-box .overflow-hidden-right .time-item {
+  margin: 5px 0;
+  width: 200px;
+  text-align: center;
+  line-height: 20px;
+  font-size: 16px;
+}
+#dialog-container .dialog-main .dialog-content .dialog-night-box .dialog-night-content {
+  display: flex;
+  flex-wrap: wrap;
+}
+#dialog-container .dialog-main .dialog-content .dialog-content-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  min-width: 90px;
+}
+#dialog-container .dialog-main .dialog-content .dialog-content-list:not(:first-child) {
+  margin-left: 10px;
+}
+#dialog-container .dialog-main .dialog-content .dialog-content-list .dialog-content-list-item {
+  float: none;
+  font-size: 16px;
+  text-align: center;
+}
+#dialog-container .dialog-main .dialog-night-popup {
+  display: none;
+  position: absolute;
+  top: 30px;
+  left: 30px;
+  width: calc(100% - 60px);
+  height: calc(100% - 60px);
+  background-color: rgba(0, 0, 0, 0.7);
+}
+#dialog-container .dialog-main .dialog-night-popup .dialog-night-set-time {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  padding: 20px;
+  width: 400px;
+  height: 400px;
+  background-color: #fff;
+}
+#dialog-container .dialog-main .dialog-night-popup .dialog-night-set-time .time-row {
+  position: relative;
+  margin: 0;
+  padding: 5px 0;
+  height: 26px;
+  font-size: 0;
+}
+#dialog-container .dialog-main .dialog-night-popup .dialog-night-set-time .time-row span {
+  font-size: 16px;
+  line-height: 26px;
+}
+#dialog-container .dialog-main .dialog-night-popup .dialog-night-set-time .time-row .span-button {
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+  border: 1px solid #333;
+  border-radius: 50%;
+}
+#dialog-container .dialog-main .dialog-night-popup .dialog-night-set-time .time-row .span-button::before,
+#dialog-container .dialog-main .dialog-night-popup .dialog-night-set-time .time-row .span-button::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+#dialog-container .dialog-main .dialog-night-popup .dialog-night-set-time .time-row .span-button::before {
+  width: 2px;
+  height: 18px;
+}
+#dialog-container .dialog-main .dialog-night-popup .dialog-night-set-time .time-row .span-button::after {
+  width: 18px;
+  height: 2px;
+}
+#dialog-container .dialog-main .dialog-night-popup .dialog-night-set-time .time-row .delete-time-row {
+  margin-left: 10px;
+  transform: rotate(45deg);
+}
+#dialog-container .dialog-main .dialog-night-popup .dialog-night-set-time .time-row .delete-time-row::before,
+#dialog-container .dialog-main .dialog-night-popup .dialog-night-set-time .time-row .delete-time-row::after {
+  background-color: red;
+}
+#dialog-container .dialog-main .dialog-night-popup .dialog-night-set-time .time-row .add-time-row {
+  top: 5px;
+  left: 0;
+}
+#dialog-container .dialog-main .dialog-night-popup .dialog-night-set-time .time-row .add-time-row::before,
+#dialog-container .dialog-main .dialog-night-popup .dialog-night-set-time .time-row .add-time-row::after {
+  background-color: lime;
+}
+#dialog-container .dialog-main .dialog-night-popup .dialog-night-set-time .dialog-night-button {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  width: 400px;
+  margin: 0;
+  display: flex;
+  justify-content: space-between;
+}
+#dialog-container .dialog-main .dialog-night-popup .dialog-night-set-time .dialog-night-button button {
+  font-size: 16px;
+}
