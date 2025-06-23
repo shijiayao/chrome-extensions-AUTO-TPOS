@@ -38,8 +38,6 @@ try {
     console.log(error);
 }
 
-changeUI('http://10.126.26.156');
-
 const buttonStartStudy = document.getElementById('start-study');
 const buttonExam = document.querySelectorAll('.exam-button');
 const buttonViolationStatisticsMonthly = document.getElementById('violation-statistics-button-monthly');
@@ -136,9 +134,9 @@ function changeUI(url) {
     const URLObject = new URL(url);
     const HrefLowercase = String(URLObject.href).toLowerCase();
     const PathnameLowercase = String(URLObject.pathname).toLowerCase();
-    const PathnameTargetList = ['/homePage', '/myClass/fromPage', '/myTrainingCourseList', '/home/courseDetail', '/exam/examDetail'].map((element) => element.toLowerCase());
+    const PathnameTargetList = ['/homePage', '/myClass/fromPage', '/myTrainingCourseList', '/home/courseDetail', '/exam/examDetail', '/rmweb/punishment'].map((element) => element.toLowerCase());
     const IsOnlineSchools = URLObject.hostname.indexOf('11.33.1.253') > -1; // 网校
-    const IsViolationStatistics = URLObject.hostname.indexOf('10.126.26.156') > -1; // 违法数据
+    const IsViolationStatistics = PathnameLowercase.indexOf(PathnameTargetList[5]) > -1; // 违法数据
     const IsHomePage = PathnameLowercase.indexOf(PathnameTargetList[0]) === 0; // 首页
     const IsFromPage = PathnameLowercase.indexOf(PathnameTargetList[1]) > -1; // 班级列表页
     const IsCourseList = PathnameLowercase.indexOf(PathnameTargetList[2]) > -1; // 课程列表页

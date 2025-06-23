@@ -8,6 +8,10 @@
   padding: 30px;
   height: calc(100% - 60px);
 }
+#dialog-container .dialog-main button {
+  padding: revert;
+  border: 1px solid #ddd;
+}
 #dialog-container .dialog-main .dialog-close {
   position: absolute;
   top: 2px;

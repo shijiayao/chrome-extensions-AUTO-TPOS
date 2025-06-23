@@ -87,6 +87,7 @@ chrome.runtime.onMessage.addListener(async function (request, sender, sendRespon
                 InjectFilesIntoThePage({
                     stringParam : [{ buttonTag : request.action }],
                     scriptFiles : [LocalInjectFiles.auto_example],
+                    styleFiles  : [],
                     callback    : () => {}
                 });
                 break;
@@ -94,8 +95,8 @@ chrome.runtime.onMessage.addListener(async function (request, sender, sendRespon
             case 'ViolationStatisticsCustomize':
                 InjectFilesIntoThePage({
                     stringParam : [{ buttonTag : request.action }],
-                    scriptFiles : [LocalInjectFiles.stats_js, LocalInjectFiles.auto_example],
-                    styleFiles  : [LocalInjectFiles.stats_css],
+                    scriptFiles : [LocalInjectFiles.auto_example],
+                    styleFiles  : [],
                     callback    : () => {}
                 });
                 break;
@@ -131,6 +132,7 @@ function RuntimeGetURLInjectedFiles_Script(filePath) {
     let injectedFiles = chrome.runtime.getURL(filePath);
     let injectedScriptDOM = document.createElement('script');
     injectedScriptDOM.async = false;
+    injectedScriptDOM.charset = 'utf-8';
     injectedScriptDOM.src = injectedFiles;
 
     document.head.appendChild(injectedScriptDOM);

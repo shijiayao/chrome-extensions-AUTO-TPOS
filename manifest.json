@@ -20,6 +20,14 @@
             "js": ["/content-scripts/MAIN/content-script-window.js"],
             "run_at": "document_idle",
             "world": "MAIN"
+        },
+        {
+            "matches": ["*://*/*"],
+            "include_globs": ["*://*/rmweb/punishment*"],
+            "css": ["/content-scripts/MAIN/content-script-stats/stats.css"],
+            "js": ["/content-scripts/MAIN/content-script-stats/stats.js"],
+            "run_at": "document_idle",
+            "world": "MAIN"
         }
     ],
     "content_security_policy": {
