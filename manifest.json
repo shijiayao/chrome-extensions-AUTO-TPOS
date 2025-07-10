@@ -2,7 +2,7 @@
     "manifest_version": 3,
     "name": "Auto TPOS",
     "description": "Automatically learn and take exams in online schools, and automatically collect data on the illegal data statistics page.",
-    "version": "3.2.0",
+    "version": "3.3.0",
     "background": {
         "service_worker": "/background/service_worker.js"
     },

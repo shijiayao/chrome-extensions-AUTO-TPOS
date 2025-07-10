@@ -8,9 +8,11 @@
         padding: 30px;
         height: calc(100% - 60px);
 
+        input,
         button {
             padding: revert;
-            border: 1px solid #ddd;
+            font-size: 16px;
+            border: 1px solid #111;
         }
 
         .dialog-close {
@@ -45,75 +47,71 @@
             }
         }
 
-        .dialog-content {
+        .dialog-content-wrap {
             position: relative;
-            display: flex;
-            flex-wrap: wrap;
-            padding-top: 70px;
             width: 100%;
             height: 100%;
             background-color: #fff;
-            font-size: 0;
-            box-sizing: border-box;
+            overflow-y: auto;
 
-            .dialog-night-box {
+            .dialog-content {
+                position: relative;
+                display: flex;
+                flex-wrap: wrap;
+                padding-top: 70px;
+                width: 100%;
+                font-size: 0;
+                box-sizing: border-box;
+
+                .dialog-content-list-box {
+                    display: flex;
+                    flex-wrap: wrap;
+                }
+
+                .dialog-content-total-box {
+                    display: flex;
+                    flex-wrap: wrap;
+                }
+
+                .dialog-content-list {
+                    margin: 0;
+                    padding: 0;
+                    list-style: none;
+                    min-width: 90px;
+
+                    &:not(:first-child) {
+                        margin-left: 10px;
+                    }
+
+                    .dialog-content-list-item {
+                        float: none;
+                        font-size: 16px;
+                        text-align: center;
+                    }
+                }
+            }
+
+            .dialog-set-param {
                 position: absolute;
                 top: 0;
                 left: 0;
                 width: 100%;
                 height: 60px;
 
-                .float-left {
-                    float: left;
+                .set-param-box {
                     display: grid;
-                    place-items: center;
-                    width: 200px;
-                    height: 60px;
+                    place-items: center; /* 同时水平和垂直居中 */
+                    width: 100%;
+                    height: 100%;
 
-                    #dialog-night-button {
+                    #dialog-set-param-button {
                         font-size: 16px;
                     }
-                }
-
-                .overflow-hidden-right {
-                    overflow: hidden;
-                    display: flex;
-                    flex-wrap: wrap;
-
-                    .time-item {
-                        margin: 5px 0;
-                        width: 200px;
-                        text-align: center;
-                        line-height: 20px;
-                        font-size: 16px;
-                    }
-                }
-
-                .dialog-night-content {
-                    display: flex;
-                    flex-wrap: wrap;
-                }
-            }
-
-            .dialog-content-list {
-                margin: 0;
-                padding: 0;
-                list-style: none;
-                min-width: 90px;
-
-                &:not(:first-child) {
-                    margin-left: 10px;
-                }
-
-                .dialog-content-list-item {
-                    float: none;
-                    font-size: 16px;
-                    text-align: center;
                 }
             }
         }
 
-        .dialog-night-popup {
+        .dialog-set-param-popup {
             display: none;
             position: absolute;
             top: 30px;
@@ -122,88 +120,125 @@
             height: calc(100% - 60px);
             background-color: rgba(0, 0, 0, 0.7);
 
-            .dialog-night-set-time {
-                position: absolute;
-                inset: 0;
-                margin: auto;
-                padding: 20px;
-                width: 400px;
-                height: 400px;
+            .dialog-set-param-wrap {
+                display: flex;
+                justify-content: space-around;
+                width: 100%;
+                height: 100%;
+                padding: 20px 15px 40px;
                 background-color: #fff;
+                box-sizing: border-box;
 
-                .time-row {
-                    position: relative;
-                    margin: 0;
-                    padding: 5px 0;
-                    height: 26px;
-                    font-size: 0;
+                .dialog-set-item {
+                    min-width: 280px;
+                    padding: 0 5px;
 
-                    span {
-                        font-size: 16px;
-                        line-height: 26px;
-                    }
+                    .item-row-p {
+                        position: relative;
+                        margin: 0;
+                        padding: 5px 0;
+                        height: 26px;
+                        font-size: 0;
 
-                    .span-button {
-                        position: absolute;
-                        width: 24px;
-                        height: 24px;
-                        cursor: pointer;
-                        border: 1px solid #333;
-                        border-radius: 50%;
+                        &.center-title {
+                            text-align: center;
+                        }
 
-                        &::before,
-                        &::after {
-                            content: '';
+                        span {
+                            font-size: 16px;
+                            line-height: 26px;
+                        }
+
+                        .span-button {
                             position: absolute;
-                            top: 50%;
-                            left: 50%;
-                            transform: translate(-50%, -50%);
+                            width: 24px;
+                            height: 24px;
+                            cursor: pointer;
+                            border: 1px solid #333;
+                            border-radius: 50%;
+
+                            &::before,
+                            &::after {
+                                content: '';
+                                position: absolute;
+                                top: 50%;
+                                left: 50%;
+                                transform: translate(-50%, -50%);
+                            }
+
+                            &::before {
+                                width: 2px;
+                                height: 18px;
+                            }
+
+                            &::after {
+                                width: 18px;
+                                height: 2px;
+                            }
                         }
 
-                        &::before {
-                            width: 2px;
-                            height: 18px;
+                        .delete-row {
+                            margin-left: 10px;
+                            transform: rotate(45deg);
+
+                            &::before,
+                            &::after {
+                                background-color: red;
+                            }
                         }
 
-                        &::after {
-                            width: 18px;
-                            height: 2px;
-                        }
-                    }
+                        .add-row {
+                            top: 5px;
+                            left: 0;
 
-                    .delete-time-row {
-                        margin-left: 10px;
-                        transform: rotate(45deg);
-
-                        &::before,
-                        &::after {
-                            background-color: red;
-                        }
-                    }
-
-                    .add-time-row {
-                        top: 5px;
-                        left: 0;
-
-                        &::before,
-                        &::after {
-                            background-color: lime;
+                            &::before,
+                            &::after {
+                                background-color: lime;
+                            }
                         }
                     }
                 }
 
-                .dialog-night-button {
-                    position: absolute;
-                    bottom: 20px;
-                    left: 20px;
-                    width: 400px;
-                    margin: 0;
-                    display: flex;
-                    justify-content: space-between;
-
-                    button {
-                        font-size: 16px;
+                .dialog-set-time {
+                    .time-row {
                     }
+                }
+
+                .dialog-set-extra {
+                    .extra-row {
+                    }
+                }
+
+                .dialog-set-keynote {
+                    display: grid;
+                    grid-template-columns: 1fr 1fr;
+                    grid-auto-rows: auto;
+                    gap: 0;
+
+                    .keynote-row {
+                        &:first-child {
+                            grid-column: 1 / span 2; // 独占首行
+                        }
+
+                        // 其余子元素自动两列分布，无需特殊处理
+                        input {
+                            width: 80px;
+                        }
+                    }
+                }
+            }
+
+            .dialog-set-param-button {
+                position: absolute;
+                bottom: 5px;
+                left: 0;
+                width: 100%;
+                margin: 0;
+                display: flex;
+                justify-content: space-around;
+
+                button {
+                    font-size: 16px;
                 }
             }
         }

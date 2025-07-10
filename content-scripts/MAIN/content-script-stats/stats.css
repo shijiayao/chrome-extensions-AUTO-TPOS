@@ -8,9 +8,11 @@
   padding: 30px;
   height: calc(100% - 60px);
 }
+#dialog-container .dialog-main input,
 #dialog-container .dialog-main button {
   padding: revert;
-  border: 1px solid #ddd;
+  font-size: 16px;
+  border: 1px solid #111;
 }
 #dialog-container .dialog-main .dialog-close {
   position: absolute;
@@ -40,65 +42,62 @@
   width: 24px;
   height: 2px;
 }
-#dialog-container .dialog-main .dialog-content {
+#dialog-container .dialog-main .dialog-content-wrap {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background-color: #fff;
+  overflow-y: auto;
+}
+#dialog-container .dialog-main .dialog-content-wrap .dialog-content {
   position: relative;
   display: flex;
   flex-wrap: wrap;
   padding-top: 70px;
   width: 100%;
-  height: 100%;
-  background-color: #fff;
   font-size: 0;
   box-sizing: border-box;
 }
-#dialog-container .dialog-main .dialog-content .dialog-night-box {
+#dialog-container .dialog-main .dialog-content-wrap .dialog-content .dialog-content-list-box {
+  display: flex;
+  flex-wrap: wrap;
+}
+#dialog-container .dialog-main .dialog-content-wrap .dialog-content .dialog-content-total-box {
+  display: flex;
+  flex-wrap: wrap;
+}
+#dialog-container .dialog-main .dialog-content-wrap .dialog-content .dialog-content-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  min-width: 90px;
+}
+#dialog-container .dialog-main .dialog-content-wrap .dialog-content .dialog-content-list:not(:first-child) {
+  margin-left: 10px;
+}
+#dialog-container .dialog-main .dialog-content-wrap .dialog-content .dialog-content-list .dialog-content-list-item {
+  float: none;
+  font-size: 16px;
+  text-align: center;
+}
+#dialog-container .dialog-main .dialog-content-wrap .dialog-set-param {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 60px;
 }
-#dialog-container .dialog-main .dialog-content .dialog-night-box .float-left {
-  float: left;
+#dialog-container .dialog-main .dialog-content-wrap .dialog-set-param .set-param-box {
   display: grid;
   place-items: center;
-  width: 200px;
-  height: 60px;
+  /* 同时水平和垂直居中 */
+  width: 100%;
+  height: 100%;
 }
-#dialog-container .dialog-main .dialog-content .dialog-night-box .float-left #dialog-night-button {
+#dialog-container .dialog-main .dialog-content-wrap .dialog-set-param .set-param-box #dialog-set-param-button {
   font-size: 16px;
 }
-#dialog-container .dialog-main .dialog-content .dialog-night-box .overflow-hidden-right {
-  overflow: hidden;
-  display: flex;
-  flex-wrap: wrap;
-}
-#dialog-container .dialog-main .dialog-content .dialog-night-box .overflow-hidden-right .time-item {
-  margin: 5px 0;
-  width: 200px;
-  text-align: center;
-  line-height: 20px;
-  font-size: 16px;
-}
-#dialog-container .dialog-main .dialog-content .dialog-night-box .dialog-night-content {
-  display: flex;
-  flex-wrap: wrap;
-}
-#dialog-container .dialog-main .dialog-content .dialog-content-list {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  min-width: 90px;
-}
-#dialog-container .dialog-main .dialog-content .dialog-content-list:not(:first-child) {
-  margin-left: 10px;
-}
-#dialog-container .dialog-main .dialog-content .dialog-content-list .dialog-content-list-item {
-  float: none;
-  font-size: 16px;
-  text-align: center;
-}
-#dialog-container .dialog-main .dialog-night-popup {
+#dialog-container .dialog-main .dialog-set-param-popup {
   display: none;
   position: absolute;
   top: 30px;
@@ -107,27 +106,34 @@
   height: calc(100% - 60px);
   background-color: rgba(0, 0, 0, 0.7);
 }
-#dialog-container .dialog-main .dialog-night-popup .dialog-night-set-time {
-  position: absolute;
-  inset: 0;
-  margin: auto;
-  padding: 20px;
-  width: 400px;
-  height: 400px;
+#dialog-container .dialog-main .dialog-set-param-popup .dialog-set-param-wrap {
+  display: flex;
+  justify-content: space-around;
+  width: 100%;
+  height: 100%;
+  padding: 20px 15px 40px;
   background-color: #fff;
+  box-sizing: border-box;
 }
-#dialog-container .dialog-main .dialog-night-popup .dialog-night-set-time .time-row {
+#dialog-container .dialog-main .dialog-set-param-popup .dialog-set-param-wrap .dialog-set-item {
+  min-width: 280px;
+  padding: 0 5px;
+}
+#dialog-container .dialog-main .dialog-set-param-popup .dialog-set-param-wrap .dialog-set-item .item-row-p {
   position: relative;
   margin: 0;
   padding: 5px 0;
   height: 26px;
   font-size: 0;
 }
-#dialog-container .dialog-main .dialog-night-popup .dialog-night-set-time .time-row span {
+#dialog-container .dialog-main .dialog-set-param-popup .dialog-set-param-wrap .dialog-set-item .item-row-p.center-title {
+  text-align: center;
+}
+#dialog-container .dialog-main .dialog-set-param-popup .dialog-set-param-wrap .dialog-set-item .item-row-p span {
   font-size: 16px;
   line-height: 26px;
 }
-#dialog-container .dialog-main .dialog-night-popup .dialog-night-set-time .time-row .span-button {
+#dialog-container .dialog-main .dialog-set-param-popup .dialog-set-param-wrap .dialog-set-item .item-row-p .span-button {
   position: absolute;
   width: 24px;
   height: 24px;
@@ -135,47 +141,59 @@
   border: 1px solid #333;
   border-radius: 50%;
 }
-#dialog-container .dialog-main .dialog-night-popup .dialog-night-set-time .time-row .span-button::before,
-#dialog-container .dialog-main .dialog-night-popup .dialog-night-set-time .time-row .span-button::after {
+#dialog-container .dialog-main .dialog-set-param-popup .dialog-set-param-wrap .dialog-set-item .item-row-p .span-button::before,
+#dialog-container .dialog-main .dialog-set-param-popup .dialog-set-param-wrap .dialog-set-item .item-row-p .span-button::after {
   content: '';
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
 }
-#dialog-container .dialog-main .dialog-night-popup .dialog-night-set-time .time-row .span-button::before {
+#dialog-container .dialog-main .dialog-set-param-popup .dialog-set-param-wrap .dialog-set-item .item-row-p .span-button::before {
   width: 2px;
   height: 18px;
 }
-#dialog-container .dialog-main .dialog-night-popup .dialog-night-set-time .time-row .span-button::after {
+#dialog-container .dialog-main .dialog-set-param-popup .dialog-set-param-wrap .dialog-set-item .item-row-p .span-button::after {
   width: 18px;
   height: 2px;
 }
-#dialog-container .dialog-main .dialog-night-popup .dialog-night-set-time .time-row .delete-time-row {
+#dialog-container .dialog-main .dialog-set-param-popup .dialog-set-param-wrap .dialog-set-item .item-row-p .delete-row {
   margin-left: 10px;
   transform: rotate(45deg);
 }
-#dialog-container .dialog-main .dialog-night-popup .dialog-night-set-time .time-row .delete-time-row::before,
-#dialog-container .dialog-main .dialog-night-popup .dialog-night-set-time .time-row .delete-time-row::after {
+#dialog-container .dialog-main .dialog-set-param-popup .dialog-set-param-wrap .dialog-set-item .item-row-p .delete-row::before,
+#dialog-container .dialog-main .dialog-set-param-popup .dialog-set-param-wrap .dialog-set-item .item-row-p .delete-row::after {
   background-color: red;
 }
-#dialog-container .dialog-main .dialog-night-popup .dialog-night-set-time .time-row .add-time-row {
+#dialog-container .dialog-main .dialog-set-param-popup .dialog-set-param-wrap .dialog-set-item .item-row-p .add-row {
   top: 5px;
   left: 0;
 }
-#dialog-container .dialog-main .dialog-night-popup .dialog-night-set-time .time-row .add-time-row::before,
-#dialog-container .dialog-main .dialog-night-popup .dialog-night-set-time .time-row .add-time-row::after {
+#dialog-container .dialog-main .dialog-set-param-popup .dialog-set-param-wrap .dialog-set-item .item-row-p .add-row::before,
+#dialog-container .dialog-main .dialog-set-param-popup .dialog-set-param-wrap .dialog-set-item .item-row-p .add-row::after {
   background-color: lime;
 }
-#dialog-container .dialog-main .dialog-night-popup .dialog-night-set-time .dialog-night-button {
+#dialog-container .dialog-main .dialog-set-param-popup .dialog-set-param-wrap .dialog-set-keynote {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-auto-rows: auto;
+  gap: 0;
+}
+#dialog-container .dialog-main .dialog-set-param-popup .dialog-set-param-wrap .dialog-set-keynote .keynote-row:first-child {
+  grid-column: 1 / span 2;
+}
+#dialog-container .dialog-main .dialog-set-param-popup .dialog-set-param-wrap .dialog-set-keynote .keynote-row input {
+  width: 80px;
+}
+#dialog-container .dialog-main .dialog-set-param-popup .dialog-set-param-button {
   position: absolute;
-  bottom: 20px;
-  left: 20px;
-  width: 400px;
+  bottom: 5px;
+  left: 0;
+  width: 100%;
   margin: 0;
   display: flex;
-  justify-content: space-between;
+  justify-content: space-around;
 }
-#dialog-container .dialog-main .dialog-night-popup .dialog-night-set-time .dialog-night-button button {
+#dialog-container .dialog-main .dialog-set-param-popup .dialog-set-param-button button {
   font-size: 16px;
 }

@@ -5,15 +5,7 @@ async function AUTO_TPOS_VIOLATION_STATISTICS() {
         });
     }
 
-    let ExampleObject = {
-        DB_Example        : null,
-        TableTotalData    : null,
-        MonthlyKeyList    : null,
-        MonthlyKeyFlag    : null,
-        TableTotalData_DB : null,
-        CustomizeTempData : null,
-        TotalPersonnel    : null
-    };
+    let ExampleObject = {};
 
     class indexedDB_Class {
         constructor({ DB_Name = 'TicketDatabase', DB_ObjectStore_NameList = [] } = {}) {
@@ -208,6 +200,8 @@ async function AUTO_TPOS_VIOLATION_STATISTICS() {
     }
 
     async function STATISTICS_MONTHLY() {
+        const StoreKey = 'TableTotalData';
+
         const TableTotalData = [].reduce.call(
             document.querySelectorAll('.list tr.out'),
             (Total, element, index) => {
@@ -219,11 +213,7 @@ async function AUTO_TPOS_VIOLATION_STATISTICS() {
                 const Litigant = RowCells[5].textContent; // 当事人
                 const PoliceName = RowCells[7].textContent; // 执勤民警
 
-                const TimeSplitArray = OccurrenceTime.split(/-|:| /);
-                const MonthlyKey = `${TimeSplitArray[0]}年${TimeSplitArray[1]}月`;
-                const MonthlyTotal = Total[MonthlyKey] || []; // 年份月份
-
-                MonthlyTotal.push({
+                Total[StoreKey].push({
                     DocumentNumber,
                     LicensePlate,
                     OccurrenceTime,
@@ -232,51 +222,49 @@ async function AUTO_TPOS_VIOLATION_STATISTICS() {
                     PoliceName
                 });
 
-                Total[MonthlyKey] = MonthlyTotal;
-
                 return Total;
             },
-            {}
+            { [StoreKey] : [] }
         );
 
-        const MonthlyKeyList = Object.keys(TableTotalData);
-        const MonthlyKeyFlag = MonthlyKeyList.reduce((result, element, index) => {
+        const StoreKeyList = [StoreKey];
+        const StoreKeyFlag = StoreKeyList.reduce((result, element, index) => {
             result[element] = false;
             return result;
         }, {});
         const TableTotalData_DB = {};
         const TotalPersonnel = {};
 
-        if (MonthlyKeyList.length === 0) {
+        if (StoreKeyList.length === 0) {
             return;
         }
 
         const DB_Example = new indexedDB_Class({
             DB_Name                 : 'TicketDatabase',
-            DB_ObjectStore_NameList : MonthlyKeyList
+            DB_ObjectStore_NameList : StoreKeyList
         });
 
         await DB_Example.init();
 
-        for (let index = 0; index < MonthlyKeyList.length; index++) {
-            const Key = MonthlyKeyList[index];
+        for (let index = 0; index < StoreKeyList.length; index++) {
+            const Key = StoreKeyList[index];
             await DB_Example.ObjectStore_Get(Key).then((event) => {
                 TableTotalData_DB[Key] = event.target.result || [];
             });
         }
 
-        for (let index = 0; index < MonthlyKeyList.length; index++) {
-            const Key = MonthlyKeyList[index];
+        for (let index = 0; index < StoreKeyList.length; index++) {
+            const Key = StoreKeyList[index];
             TableTotalData[Key].forEach((element01, index01) => {
                 if (!TableTotalData_DB[Key].some((element02, index02) => element01.DocumentNumber === element02.DocumentNumber)) {
                     TableTotalData_DB[Key].push(element01);
-                    MonthlyKeyFlag[Key] = true;
+                    StoreKeyFlag[Key] = true;
                 }
             });
         }
 
-        for (const key in MonthlyKeyFlag) {
-            if (MonthlyKeyFlag[key]) {
+        for (const key in StoreKeyFlag) {
+            if (StoreKeyFlag[key]) {
                 await DB_Example.ObjectStore_Add(key, TableTotalData_DB[key]).then((event) => {
                     console.log(event);
                 });
@@ -318,10 +306,10 @@ async function AUTO_TPOS_VIOLATION_STATISTICS() {
         ExampleObject = {
             DB_Example,
             TableTotalData,
-            MonthlyKeyList,
-            MonthlyKeyFlag,
+            StoreKeyList,
+            StoreKeyFlag,
             TableTotalData_DB,
-            TotalPersonnel
+            TotalPersonnel : TotalPersonnel[Object.keys(TotalPersonnel)[0]]
         };
 
         console.log(ExampleObject);
@@ -339,11 +327,7 @@ async function AUTO_TPOS_VIOLATION_STATISTICS() {
                 const Litigant = RowCells[5].textContent; // 当事人
                 const PoliceName = RowCells[7].textContent; // 执勤民警
 
-                const TimeSplitArray = OccurrenceTime.split(/-|:| /);
-                const MonthlyKey = `${TimeSplitArray[0]}年${TimeSplitArray[1]}月`;
-                const MonthlyTotal = Total[MonthlyKey] || []; // 年份月份
-
-                MonthlyTotal.push({
+                Total.push({
                     DocumentNumber,
                     LicensePlate,
                     OccurrenceTime,
@@ -352,69 +336,61 @@ async function AUTO_TPOS_VIOLATION_STATISTICS() {
                     PoliceName
                 });
 
-                Total[MonthlyKey] = MonthlyTotal;
-
                 return Total;
             },
-            {}
+            []
         );
 
-        const MonthlyKeyList = Object.keys(TableTotalData);
-        const CustomizeTempData = JSON.parse(sessionStorage.getItem('CUSTOMIZE_TEMP_DATA') || '{}');
-        const TotalPersonnel = {};
+        // 从 sessionStorage 获取临时数据
+        const CustomizeTempData = JSON.parse(sessionStorage.getItem('CUSTOMIZE_TEMP_DATA') || '[]');
 
-        if (MonthlyKeyList.length === 0) {
+        if (TableTotalData.length === 0) {
             return;
         }
 
-        for (let index = 0; index < MonthlyKeyList.length; index++) {
-            const Key = MonthlyKeyList[index];
-            if (!CustomizeTempData[Key]) {
-                CustomizeTempData[Key] = [];
+        // 去重
+        TableTotalData.forEach((element01, index01) => {
+            if (!CustomizeTempData.some((element02, index02) => element01.DocumentNumber === element02.DocumentNumber)) {
+                CustomizeTempData.push(element01);
+            }
+        });
+
+        // 排序，按照 OccurrenceTime 时间顺序
+        CustomizeTempData.sort((a, b) => new Date(a.OccurrenceTime) - new Date(b.OccurrenceTime));
+
+        // 存储每个人员处理的违法行为
+        const TotalPersonnel = CustomizeTempData.reduce((Total, element, index) => {
+            const DocumentNumber = element.DocumentNumber; // 文书编号
+            const LicensePlate = element.LicensePlate; // 号牌号码
+            const OccurrenceTime = element.OccurrenceTime; // 违法时间
+            const TrafficViolationsCode = element.TrafficViolationsCode; // 违法行为 违法代码
+            const Litigant = element.Litigant; // 当事人
+            const PoliceName = element.PoliceName; // 执勤民警
+
+            const PersonnelTotal = Total[PoliceName] || {
+                DetailArray : [],
+                IDObject    : {}
+            };
+
+            if (!PersonnelTotal.DetailArray.some((element02) => DocumentNumber === element02.DocumentNumber)) {
+                PersonnelTotal.DetailArray.push({
+                    DocumentNumber,
+                    LicensePlate,
+                    OccurrenceTime,
+                    TrafficViolationsCode,
+                    Litigant,
+                    PoliceName
+                });
+                PersonnelTotal.IDObject[TrafficViolationsCode] ? PersonnelTotal.IDObject[TrafficViolationsCode]++ : (PersonnelTotal.IDObject[TrafficViolationsCode] = 1);
             }
 
-            TableTotalData[Key].forEach((element01, index01) => {
-                if (!CustomizeTempData[Key].some((element02, index02) => element01.DocumentNumber === element02.DocumentNumber)) {
-                    CustomizeTempData[Key].push(element01);
-                }
-            });
-        }
+            Total[PoliceName] = PersonnelTotal;
 
-        for (const key in CustomizeTempData) {
-            TotalPersonnel[key] = CustomizeTempData[key].reduce((Total, element, index) => {
-                const DocumentNumber = element.DocumentNumber; // 文书编号
-                const LicensePlate = element.LicensePlate; // 号牌号码
-                const OccurrenceTime = element.OccurrenceTime; // 违法时间
-                const TrafficViolationsCode = element.TrafficViolationsCode; // 违法行为 违法代码
-                const Litigant = element.Litigant; // 当事人
-                const PoliceName = element.PoliceName; // 执勤民警
-
-                const PersonnelTotal = Total[PoliceName] || {
-                    DetailArray : [],
-                    IDObject    : {}
-                };
-
-                if (!PersonnelTotal.DetailArray.some((element02) => DocumentNumber === element02.DocumentNumber)) {
-                    PersonnelTotal.DetailArray.push({
-                        DocumentNumber,
-                        LicensePlate,
-                        OccurrenceTime,
-                        TrafficViolationsCode,
-                        Litigant,
-                        PoliceName
-                    });
-                    PersonnelTotal.IDObject[TrafficViolationsCode] ? PersonnelTotal.IDObject[TrafficViolationsCode]++ : (PersonnelTotal.IDObject[TrafficViolationsCode] = 1);
-                }
-
-                Total[PoliceName] = PersonnelTotal;
-
-                return Total;
-            }, {});
-        }
+            return Total;
+        }, {});
 
         ExampleObject = {
             TableTotalData,
-            MonthlyKeyList,
             CustomizeTempData,
             TotalPersonnel
         };
@@ -428,94 +404,196 @@ async function AUTO_TPOS_VIOLATION_STATISTICS() {
      * 动态创建违法统计数据表格并展现到页面上
      * @param {Object} dataList
      */
-    async function openViolationStatisticsDataHtml(dataList) {
-        const NightTotal = [
+    async function openViolationStatisticsDataHtml(paramDataList) {
+        // 复制数据 paramDataList 到 dataList
+        let dataList = JSON.parse(JSON.stringify(paramDataList));
+
+        const StartingTime = {
+            init      : true, // 初始化标记，初始化结束后改为 false
+            startTime : 0, // 默认开始时间
+            endTime   : 0 // 默认结束时间
+        };
+        const ExtraTotal = [
             [12, 0, 15, 0],
             [18, 0, 8, 0]
-        ]; // 夜间
+        ]; // 额外
+        const Keynote = ['4302', '4303', '4312', '4608', '4901', '4902']; // 重点
 
         const dialogContainerDom = document.createElement('div');
         dialogContainerDom.id = 'dialog-container';
 
-        let domStringFirst = [];
-        let domStringMiddle = [];
-        let domStringLast = [];
+        let domStringArray = [];
 
-        domStringFirst.push(`<div class="dialog-main">`);
-        domStringFirst.push(`<div class="dialog-close"></div>`);
-        domStringFirst.push(`<div class="dialog-content">`);
+        domStringArray.push(`<div class="dialog-main">`); // 开始 dialog-main
 
-        domStringMiddle.push(`<div class="dialog-night-box">`);
-        domStringMiddle.push(`<div class="float-left"><button id="dialog-night-button">夜间设置</button></div>`);
-        domStringMiddle.push(`<div class="overflow-hidden-right">`);
-        NightTotal.map((item, index) => {
-            domStringMiddle.push(`<p class="time-item">${item[0].toString().padStart(2, '0')}:${item[1].toString().padStart(2, '0')} - ${item[2].toString().padStart(2, '0')}:${item[3].toString().padStart(2, '0')}</p>`);
+        domStringArray.push(`<div class="dialog-close"></div>`);
+
+        domStringArray.push(`<div class="dialog-content-wrap">`); // 开始 dialog-content-wrap
+        domStringArray.push(`<div class="dialog-content">`); // 开始 dialog-content
+        domStringArray.push(`<div class="dialog-content-list-box"></div>`);
+        domStringArray.push(`<div class="dialog-content-total-box"></div>`);
+        domStringArray.push(`</div>`); // 结束 dialog-content
+        domStringArray.push(`<div class="dialog-set-param">`); // 开始 dialog-set-param
+        domStringArray.push(`<div class="set-param-box"><button id="dialog-set-param-button">设置参数</button></div>`);
+        domStringArray.push(`</div>`); // 结束 dialog-set-param
+        domStringArray.push(`</div>`); // 结束 dialog-content-wrap
+
+        domStringArray.push(`<div class="dialog-set-param-popup">`); // 开始 dialog-set-param-popup
+        domStringArray.push(`<div class="dialog-set-param-wrap">`); // 开始 dialog-set-param-wrap
+        domStringArray.push(`<div class="dialog-set-item dialog-set-time">`); // 开始 dialog-set-time
+        domStringArray.push(`<p class="item-row-p time-row center-title"><span>数据统计时间段</span></p>`);
+        domStringArray.push(`<p class="item-row-p time-row">`);
+        domStringArray.push(`<span>开始时间：</span>`);
+        domStringArray.push(`<input type="datetime-local" id="start-date-time" value="${new Date().toISOString().slice(0, 16)}">`);
+        domStringArray.push(`</p>`);
+        domStringArray.push(`<p class="item-row-p time-row">`);
+        domStringArray.push(`<span>结束时间：</span>`);
+        domStringArray.push(`<input type="datetime-local" id="end-date-time" value="${new Date().toISOString().slice(0, 16)}">`);
+        domStringArray.push(`</p>`);
+        domStringArray.push(`</div>`); // 结束 dialog-set-time
+        domStringArray.push(`<div class="dialog-set-item dialog-set-extra">`); // 开始 dialog-set-extra
+        domStringArray.push(`<p class="item-row-p extra-row center-title"><span>额外加分时间段</span></p>`);
+        ExtraTotal.map((item, index) => {
+            domStringArray.push(`<p class="item-row-p extra-row">`);
+            domStringArray.push(`<input type="time" value="${item[0].toString().padStart(2, '0')}:${item[1].toString().padStart(2, '0')}">`);
+            domStringArray.push(`<span> - </span>`);
+            domStringArray.push(`<input type="time" value="${item[2].toString().padStart(2, '0')}:${item[3].toString().padStart(2, '0')}">`);
+            domStringArray.push(`<span class="span-button delete-row"></span>`);
+            domStringArray.push(`</p>`);
         });
-        domStringMiddle.push(`</div>`);
-        domStringMiddle.push(`</div>`);
-
-        domStringLast.push(`</div>`);
-        domStringLast.push(`<div class="dialog-night-popup">`);
-        domStringLast.push(`<div class="dialog-night-set-time">`);
-        NightTotal.map((item, index) => {
-            domStringLast.push(`<p class="time-row">`);
-            domStringLast.push(`<input type="time" value="${item[0].toString().padStart(2, '0')}:${item[1].toString().padStart(2, '0')}">`);
-            domStringLast.push(`<span> - </span>`);
-            domStringLast.push(`<input type="time" value="${item[2].toString().padStart(2, '0')}:${item[3].toString().padStart(2, '0')}">`);
-            domStringLast.push(`<span class="span-button delete-time-row"></span>`);
-            domStringLast.push(`</p>`);
+        domStringArray.push(`<p class="item-row-p extra-row"><span class="span-button add-row"></span></p>`);
+        domStringArray.push(`</div>`); // 结束 dialog-set-extra
+        domStringArray.push(`<div class="dialog-set-item dialog-set-keynote">`); // 开始 dialog-set-keynote
+        domStringArray.push(`<p class="item-row-p keynote-row center-title"><span>重点设置</span></p>`);
+        Keynote.map((item, index) => {
+            domStringArray.push(`<p class="item-row-p keynote-row">`);
+            domStringArray.push(`<input type="text" value="${item}">`);
+            domStringArray.push(`<span class="span-button delete-row"></span>`);
+            domStringArray.push(`</p>`);
         });
-        domStringLast.push(`<p class="time-row"><span class="span-button add-time-row"></span></p>`);
-        domStringLast.push(`<p class="dialog-night-button"><button id="cancel">取消</button><button id="sure">确定</button></p>`);
-        domStringLast.push(`</div>`);
-        domStringLast.push(`</div>`);
-        domStringLast.push(`</div>`);
+        domStringArray.push(`<p class="item-row-p keynote-row"><span class="span-button add-row"></span></p>`);
+        domStringArray.push(`</div>`); // 结束 dialog-set-keynote
+        domStringArray.push(`</div>`); // 结束 dialog-set-param-wrap
+        domStringArray.push(`<p class="dialog-set-param-button"><button id="cancel">取消</button><button id="sure">确定</button></p>`);
+        domStringArray.push(`</div>`); // 结束 dialog-set-param-popup
 
-        // 遍历数据并创建表格行，人员的月份详细数据
-        Object.entries(dataList).forEach(([month, personnelData]) => {
-            Object.entries(personnelData).forEach(([policeName, data]) => {
-                domStringMiddle.push(`<ul class="dialog-content-list staff-list">`);
-                domStringMiddle.push(`<li class="dialog-content-list-item">${month}</li>`);
-                domStringMiddle.push(`<li class="dialog-content-list-item">${policeName}</li>`);
-                domStringMiddle.push(`<li class="dialog-content-list-item"><label><input type="checkbox" name="total-label" value="${policeName}" checked></label></li>`);
-                Object.entries(data.IDObject).map(([code, count]) => {
-                    domStringMiddle.push(`<li class="dialog-content-list-item">${code} X ${count}</li>`);
-                });
-                domStringMiddle.push(`</ul>`);
-            });
-        });
+        domStringArray.push(`</div>`); // 结束 dialog-main
 
-        dialogContainerDom.innerHTML = [domStringFirst.join(''), domStringMiddle.join(''), domStringLast.join('')].join('');
+        dialogContainerDom.innerHTML = domStringArray.join('');
 
         // 将表格添加到页面
         document.body.appendChild(dialogContainerDom);
 
         /**
-         * 重新生成总数据
+         * 根据起始时间筛选数据
+         */
+        function FilterDataByTime() {
+            if (StartingTime.init) return;
+
+            dataList = {};
+
+            Object.entries(paramDataList).forEach(([policeName, data]) => {
+                const TempData = {
+                    DetailArray : [],
+                    IDObject    : {}
+                };
+
+                // 过滤数据，按照时间段筛选
+                TempData.DetailArray = data.DetailArray.filter((item) => {
+                    const itemTime = new Date(item.OccurrenceTime);
+                    const startTime = new Date(StartingTime.startTime);
+                    const endTime = new Date(StartingTime.endTime);
+                    return itemTime >= startTime && itemTime < endTime;
+                });
+
+                // 如果人员没有数据，则不显示
+                if (TempData.DetailArray.length > 0) {
+                    TempData.IDObject = TempData.DetailArray.reduce((IDObject, item) => {
+                        IDObject[item.TrafficViolationsCode] ? IDObject[item.TrafficViolationsCode]++ : (IDObject[item.TrafficViolationsCode] = 1);
+                        return IDObject;
+                    }, {});
+                    dataList[policeName] = TempData;
+                }
+            });
+        }
+
+        /**
+         * 生成人员详细数据
+         */
+        function RegenerateStaffData() {
+            FilterDataByTime();
+
+            // 遍历数据并创建表格行，人员的详细数据
+            let domStringStaffList = [];
+            Object.entries(dataList).forEach(([policeName, data]) => {
+                domStringStaffList.push(`<ul class="dialog-content-list staff-list">`);
+                domStringStaffList.push(`<li class="dialog-content-list-item">${policeName}</li>`);
+                domStringStaffList.push(`<li class="dialog-content-list-item"><label><input type="checkbox" name="total-label" value="${policeName}" checked></label></li>`);
+                Object.entries(data.IDObject).map(([code, count]) => {
+                    domStringStaffList.push(`<li class="dialog-content-list-item">${code} X ${count}</li>`);
+                });
+                domStringStaffList.push(`</ul>`);
+            });
+            document.querySelector('.dialog-content-list-box').innerHTML = domStringStaffList.join('');
+        }
+
+        /**
+         * 生成总计数据
          */
         function RegenerateTotalData() {
-            const EventTotal = {};
-            const DomStringObject = { domNight : [], domTotal : [] };
+            FilterDataByTime();
 
-            const Key_SelectStaffTotal = 'select_staff_total';
-            const Key_Night = '夜间';
+            const Key_StaffTotal = '合计总数';
+            const Key_SelectStaffTotal = '合计总数';
+            const Key_Extra = '额外';
+            const Key_Keynote = '重点';
+            const RegExp_Keynote = new RegExp(Keynote.map((element, index) => String(element).toUpperCase()).join('|')); // 重点正则
 
-            // 计算夜间数量
-            Object.entries(dataList).forEach(([month, personnelData]) => {
-                EventTotal[month] = {};
-                EventTotal[month][Key_SelectStaffTotal] = {}; // 被选中的人员合计总数
+            const EventTotal = { [Key_StaffTotal] : { [Key_Extra] : 0, [Key_Keynote] : 0 } };
+            const EventSelectTotal = { [Key_SelectStaffTotal] : { [Key_Extra] : 0, [Key_Keynote] : 0 } };
+            const DomStringObject = { domExtra : [], domTotal : [] };
 
-                Object.entries(personnelData).forEach(([policeName, data]) => {
-                    EventTotal[month][policeName] = EventTotal[month][policeName] ? EventTotal[month][policeName] : { 夜间 : 0 };
+            // 计算数据
+            Object.entries(dataList).forEach(([policeName, data]) => {
+                EventTotal[policeName] ? EventTotal[policeName] : (EventTotal[policeName] = { [Key_Extra] : 0, [Key_Keynote] : 0 });
+                EventSelectTotal[policeName] ? EventSelectTotal[policeName] : (EventSelectTotal[policeName] = { [Key_Extra] : 0, [Key_Keynote] : 0 });
 
-                    data.DetailArray.forEach((item) => {
-                        const TimeSplitArray = item.OccurrenceTime.split(/-|:| /);
-                        const timeHour = Number(TimeSplitArray[3]);
-                        const timeMinute = Number(TimeSplitArray[4]);
-                        const occurTime = Number(''.concat(timeHour.toString().padStart(2, '0'), timeMinute.toString().padStart(2, '0')));
+                // 所有人员的 夜间数据、重点数据
+                data.DetailArray.forEach((item) => {
+                    const TimeSplitArray = item.OccurrenceTime.split(/-|:| /);
+                    const timeHour = Number(TimeSplitArray[3]);
+                    const timeMinute = Number(TimeSplitArray[4]);
+                    const occurTime = Number(''.concat(timeHour.toString().padStart(2, '0'), timeMinute.toString().padStart(2, '0')));
 
+                    // 初始化起始时间
+                    if (StartingTime.init) {
+                        if (StartingTime.startTime === 0) {
+                            StartingTime.startTime = item.OccurrenceTime;
+                        }
+                        if (StartingTime.endTime === 0) {
+                            StartingTime.endTime = item.OccurrenceTime;
+                        }
+
+                        if (new Date(item.OccurrenceTime) < new Date(StartingTime.startTime)) {
+                            StartingTime.startTime = item.OccurrenceTime;
+                        }
+                        if (new Date(item.OccurrenceTime) > new Date(StartingTime.endTime)) {
+                            StartingTime.endTime = item.OccurrenceTime;
+                        }
+                    }
+
+                    // code 数据
+                    EventTotal[policeName][item.TrafficViolationsCode] ? EventTotal[policeName][item.TrafficViolationsCode]++ : (EventTotal[policeName][item.TrafficViolationsCode] = 1);
+                    EventTotal[Key_StaffTotal][item.TrafficViolationsCode] ? EventTotal[Key_StaffTotal][item.TrafficViolationsCode]++ : (EventTotal[Key_StaffTotal][item.TrafficViolationsCode] = 1);
+
+                    // 重点数据
+                    if (RegExp_Keynote.test(item.TrafficViolationsCode.toUpperCase())) {
+                        EventTotal[policeName][Key_Keynote]++; // 人员的重点数据
+                        EventTotal[Key_StaffTotal][Key_Keynote]++; // 所有人员重点数据合计
+
+                        // 额外数据，只有重点的才计算
                         if (
-                            NightTotal.some((timeRange) => {
+                            ExtraTotal.some((timeRange) => {
                                 const startTime = Number(''.concat(timeRange[0].toString().padStart(2, '0'), timeRange[1].toString().padStart(2, '0')));
                                 const endTime = Number(''.concat(timeRange[2].toString().padStart(2, '0'), timeRange[3].toString().padStart(2, '0')));
                                 /**
@@ -526,148 +604,186 @@ async function AUTO_TPOS_VIOLATION_STATISTICS() {
                                 return startTime < endTime ? occurTime >= startTime && occurTime < endTime : !(occurTime >= endTime && occurTime < startTime);
                             })
                         ) {
-                            EventTotal[month][policeName][Key_Night]++;
+                            EventTotal[policeName][Key_Extra]++; // 人员的额外数据
+                            EventTotal[Key_StaffTotal][Key_Extra]++; // 所有人员额外数据合计
                         }
-                    });
+                    }
                 });
             });
 
-            // 合计被选中的人员总数
-            [].forEach.call(document.querySelectorAll('#dialog-container ul.staff-list'), (e01, i01) => {
-                const ItemDom = e01.querySelectorAll('.dialog-content-list-item');
-                if (ItemDom[2].querySelector('input').checked) {
-                    const month = ItemDom[0].textContent;
-                    const policeName = ItemDom[1].textContent;
+            // 计算被选中人员的数据
+            [].forEach.call(document.querySelectorAll('#dialog-container ul.staff-list'), (element01, index01) => {
+                const ItemDom = element01.querySelectorAll('.dialog-content-list-item');
+                const policeName = ItemDom[0].textContent;
 
-                    Object.entries(dataList[month][policeName].IDObject).map(([code, count]) => {
-                        EventTotal[month][policeName][code] = EventTotal[month][policeName][code] ? EventTotal[month][policeName][code] + count : count;
-                        EventTotal[month][Key_SelectStaffTotal][code] = EventTotal[month][Key_SelectStaffTotal][code] ? EventTotal[month][Key_SelectStaffTotal][code] + count : count;
+                // 被选中的人员数据计算
+                if (ItemDom[1].querySelector('input').checked) {
+                    EventSelectTotal[policeName] = EventTotal[policeName];
+
+                    Object.entries(EventSelectTotal[policeName]).forEach(([code, count]) => {
+                        EventSelectTotal[Key_SelectStaffTotal][code] ? (EventSelectTotal[Key_SelectStaffTotal][code] += count) : (EventSelectTotal[Key_SelectStaffTotal][code] = count);
                     });
-
-                    // 合计夜间的数据
-                    EventTotal[month][Key_SelectStaffTotal][Key_Night] = EventTotal[month][Key_SelectStaffTotal][Key_Night]
-                        ? EventTotal[month][Key_SelectStaffTotal][Key_Night] + EventTotal[month][policeName][Key_Night]
-                        : EventTotal[month][policeName][Key_Night];
                 }
             });
 
-            Object.entries(EventTotal).forEach(([month, personnelData]) => {
-                DomStringObject.domNight.push(`<ul class="dialog-content-list night-ul">`);
-                DomStringObject.domNight.push(`<li class="dialog-content-list-item">${month}</li>`);
-                DomStringObject.domNight.push(`<li class="dialog-content-list-item">夜间</li>`);
-                Object.entries(personnelData).forEach(([policeName, data]) => {
-                    if (policeName !== Key_SelectStaffTotal) {
-                        DomStringObject.domNight.push(`<li class="dialog-content-list-item">${policeName} X ${data[Key_Night] || 0}</li>`);
-                    }
-                });
-                DomStringObject.domNight.push(`</ul>`);
-
-                DomStringObject.domTotal.push(`<ul class="dialog-content-list total-ul">`);
-                DomStringObject.domTotal.push(`<li class="dialog-content-list-item">${month}</li>`);
-                DomStringObject.domTotal.push(`<li class="dialog-content-list-item">总计</li>`);
-                Object.entries(EventTotal[month][Key_SelectStaffTotal]).forEach(([code, count]) => {
-                    DomStringObject.domTotal.push(`<li class="dialog-content-list-item">${code} X ${count}</li>`);
-                });
-
-                DomStringObject.domTotal.push(`</ul>`);
+            // 生成所有人员的总计数据 DOM 字符串
+            DomStringObject.domTotal.push(`<ul class="dialog-content-list total-ul">`);
+            DomStringObject.domTotal.push(`<li class="dialog-content-list-item">所有总计</li>`);
+            let TempStaffTotal = Object.entries(EventTotal[Key_StaffTotal]);
+            TempStaffTotal.sort((a, b) => {
+                if (a[0] === Key_Extra) {
+                    return 1; // 将额外放在倒数第二
+                } else if (a[0] === Key_Keynote) {
+                    return 2; // 将重点放在最后
+                } else if (b[0] === Key_Extra || b[0] === Key_Keynote) {
+                    return -1; // 将额外和重点放在最后
+                } else {
+                    return a[0].localeCompare(b[0]); // 按照代码排序
+                }
             });
-
-            document.querySelectorAll('#dialog-container ul.night-ul').forEach((item) => {
-                item.remove();
+            TempStaffTotal.forEach(([code, count]) => {
+                DomStringObject.domTotal.push(`<li class="dialog-content-list-item">${code} X ${count}</li>`);
             });
+            DomStringObject.domTotal.push(`</ul>`);
 
-            document.querySelectorAll('#dialog-container ul.total-ul').forEach((item) => {
-                item.remove();
+            // 生成选中人员的总计数据 DOM 字符串
+            DomStringObject.domTotal.push(`<ul class="dialog-content-list select-total-ul">`);
+            DomStringObject.domTotal.push(`<li class="dialog-content-list-item">选中总计</li>`);
+            let TempSelectStaffTotal = Object.entries(EventSelectTotal[Key_SelectStaffTotal]);
+            TempSelectStaffTotal.sort((a, b) => {
+                if (a[0] === Key_Extra) {
+                    return 1; // 将额外放在倒数第二
+                } else if (a[0] === Key_Keynote) {
+                    return 2; // 将重点放在最后
+                } else if (b[0] === Key_Extra || b[0] === Key_Keynote) {
+                    return -1; // 将额外和重点放在最后
+                } else {
+                    return a[0].localeCompare(b[0]); // 按照代码排序
+                }
             });
+            TempSelectStaffTotal.forEach(([code, count]) => {
+                DomStringObject.domTotal.push(`<li class="dialog-content-list-item">${code} X ${count}</li>`);
+            });
+            DomStringObject.domTotal.push(`</ul>`);
 
-            const range = document.createRange();
-            range.selectNode(document.querySelector('#dialog-container .dialog-content'));
-            const fragment = range.createContextualFragment(DomStringObject.domNight.join('') + DomStringObject.domTotal.join(''));
-
-            document.querySelector('#dialog-container .dialog-content').append(fragment);
+            document.querySelector('#dialog-container .dialog-content .dialog-content-total-box').innerHTML = DomStringObject.domExtra.join('') + DomStringObject.domTotal.join('');
         }
 
+        RegenerateStaffData();
         RegenerateTotalData();
+
+        // 初始化数据渲染完成，起始时间初始化结束
+        StartingTime.init = false;
+        document.querySelector('#dialog-container #start-date-time').value = new Date(StartingTime.startTime).toISOString().slice(0, 16);
+        document.querySelector('#dialog-container #end-date-time').value = new Date(StartingTime.endTime).toISOString().slice(0, 16);
 
         // 关闭 dialog
         document.querySelector('#dialog-container .dialog-close').addEventListener('click', () => {
             document.querySelector('#dialog-container').style.display = 'none';
         });
 
-        // 夜间设置弹窗
-        document.querySelector('#dialog-container #dialog-night-button').addEventListener('click', () => {
-            document.querySelector('#dialog-container .dialog-night-popup').style.display = 'block';
+        // 委托父元素监听 checkbox 变化事件，监听人员复选框变化事件
+        document.querySelector('#dialog-container .dialog-content-list-box').addEventListener('change', function (event) {
+            // 检查事件目标是否为 checkbox
+            if (event.target.matches('input[name="total-label"]')) {
+                RegenerateTotalData();
+            }
         });
 
-        // 关闭夜间设置弹窗
-        document.querySelector('#dialog-container .dialog-night-popup #cancel').addEventListener('click', () => {
-            document.querySelector('#dialog-container .dialog-night-popup').style.display = 'none';
+        // 参数设置按钮
+        document.querySelector('#dialog-container #dialog-set-param-button').addEventListener('click', () => {
+            document.querySelector('#dialog-container .dialog-set-param-popup').style.display = 'block';
         });
 
-        // 确认夜间设置
-        document.querySelector('#dialog-container .dialog-night-popup #sure').addEventListener('click', () => {
-            const DomString = [];
-            const TimeRows_First = document.querySelectorAll('#dialog-container .dialog-night-popup .time-row');
+        // 设置参数 行内按钮事件
+        document.querySelector('#dialog-container .dialog-set-param-popup').addEventListener('click', (event) => {
+            const RowTypeConfig = {
+                'dialog-set-time'    : 'time-row',
+                'dialog-set-extra'   : 'extra-row',
+                'dialog-set-keynote' : 'keynote-row'
+            };
+            // 点击事件委托，处理参数设置弹窗内的点击事件
+            const target = event.target;
+            if (target.classList.contains('delete-row')) {
+                // 删除行
+                const row = target.closest('.item-row-p');
+                if (row) {
+                    row.remove();
+                }
+            } else if (target.classList.contains('add-row')) {
+                // 增加行
+                const parentItem = target.closest('.dialog-set-item');
+                const parentClass = [...parentItem.classList].find((cls) => RowTypeConfig[cls]);
+                const rowClassname = RowTypeConfig[parentClass];
 
-            // 删除起始时间和结束时间相同的元素
-            for (let index = TimeRows_First.length - 1; index >= 0; index--) {
-                const row = TimeRows_First[index];
+                const newRow = document.createElement('p');
+                newRow.className = `item-row-p ${rowClassname}`;
+                let rowHtml = '';
+                if (rowClassname === 'extra-row') {
+                    rowHtml = `<input type="time" value="00:00"><span> - </span><input type="time" value="00:00">`;
+                } else if (rowClassname === 'keynote-row') {
+                    rowHtml = `<input type="text" value="">`;
+                }
+                rowHtml += `<span class="span-button delete-row"></span>`;
+                newRow.innerHTML = rowHtml;
+
+                const container = parentItem.querySelector('.item-row-p:last-child');
+                if (container) {
+                    container.insertAdjacentElement('beforebegin', newRow);
+                }
+            }
+        });
+
+        // 取消参数设置
+        document.querySelector('#dialog-container .dialog-set-param-popup #cancel').addEventListener('click', () => {
+            document.querySelector('#dialog-container .dialog-set-param-popup').style.display = 'none';
+        });
+
+        // 确认参数设置
+        document.querySelector('#dialog-container .dialog-set-param-popup #sure').addEventListener('click', () => {
+            // 获取起始时间和结束时间
+            const startDateTimeInput = document.querySelector('#dialog-container #start-date-time');
+            const endDateTimeInput = document.querySelector('#dialog-container #end-date-time');
+            const startDateTime = new Date(startDateTimeInput.value);
+            const endDateTime = new Date(endDateTimeInput.value);
+            const StartingTimeChangeFlag = startDateTime.getTime() !== StartingTime.startTime || endDateTime.getTime() !== StartingTime.endTime;
+
+            if (StartingTimeChangeFlag) {
+                StartingTime.startTime = startDateTime.toISOString().slice(0, 16);
+                StartingTime.endTime = endDateTime.toISOString().slice(0, 16);
+            }
+
+            // 额外加分时间段
+            const ExtraRow = document.querySelectorAll('#dialog-container .dialog-set-param-popup .extra-row');
+            ExtraTotal.length = 0; // 清空原有额外时间段
+            ExtraRow.forEach((row) => {
                 const inputs = row.querySelectorAll('input[type="time"]');
                 if (inputs.length === 2) {
                     const startTime = inputs[0].value;
                     const endTime = inputs[1].value;
-                    if (startTime === endTime) {
-                        row.remove();
+                    if (startTime !== endTime) {
+                        ExtraTotal.push([].concat(startTime.split(':').map(Number), endTime.split(':').map(Number)));
                     }
                 }
+            });
+
+            // 重点设置
+            const KeynoteInput = document.querySelectorAll('#dialog-container .dialog-set-param-popup .keynote-row input');
+            Keynote.length = 0; // 清空原有重点设置
+            KeynoteInput.forEach((input) => {
+                const value = input.value.trim().toUpperCase();
+                if (value) {
+                    Keynote.push(value);
+                }
+            });
+
+            if (StartingTimeChangeFlag) {
+                RegenerateStaffData();
             }
-
-            const TimeRows_Last = document.querySelectorAll('#dialog-container .dialog-night-popup .time-row');
-
-            NightTotal.length = 0; // 清空原有夜间时间段
-            TimeRows_Last.forEach((row) => {
-                const inputs = row.querySelectorAll('input[type="time"]');
-                if (inputs.length === 2) {
-                    const startTime = inputs[0].value.split(':').map(Number);
-                    const endTime = inputs[1].value.split(':').map(Number);
-                    if (startTime.length === 2 && endTime.length === 2) {
-                        NightTotal.push([].concat(startTime, endTime));
-                    }
-                }
-            });
-
-            NightTotal.map((item, index) => {
-                DomString.push(`<p class="time-item">${item[0].toString().padStart(2, '0')}:${item[1].toString().padStart(2, '0')} - ${item[2].toString().padStart(2, '0')}:${item[3].toString().padStart(2, '0')}</p>`);
-            });
-
-            document.querySelector('#dialog-container .dialog-night-box .overflow-hidden-right').innerHTML = DomString.join('');
 
             RegenerateTotalData();
 
-            document.querySelector('#dialog-container .dialog-night-popup').style.display = 'none';
-        });
-
-        // 增加夜间时段
-        document.querySelector('#dialog-container .dialog-night-popup .add-time-row').addEventListener('click', (event) => {
-            const TimeRowDom = document.createElement('p');
-            TimeRowDom.className = 'time-row';
-            TimeRowDom.innerHTML = `<input type="time" value="00:00"><span> - </span><input type="time" value="00:00"><span class="span-button delete-time-row"></span>`;
-            document.querySelector('#dialog-container .dialog-night-popup .dialog-night-set-time').insertBefore(TimeRowDom, event.target.parentNode);
-        });
-
-        // 删除夜间时段
-        document.querySelectorAll('#dialog-container .dialog-night-popup').forEach((element) => {
-            element.addEventListener('click', (event) => {
-                const TimeRowDom = event.target.closest('.delete-time-row');
-                if (TimeRowDom) {
-                    event.target.closest('.time-row').remove();
-                }
-            });
-        });
-
-        // 监听总数复选框变化事件
-        [].forEach.call(document.querySelectorAll('#dialog-container input[name="total-label"]'), (element, index) => {
-            element.addEventListener('change', RegenerateTotalData);
+            document.querySelector('#dialog-container .dialog-set-param-popup').style.display = 'none';
         });
     }
 
@@ -708,12 +824,12 @@ async function AUTO_TPOS_VIOLATION_STATISTICS() {
                     await STATISTICS_CUSTOMIZE();
                 }
                 if (Number(CurrentPage) === Number(Total)) {
+                    await openViolationStatisticsDataHtml(ExampleObject.TotalPersonnel);
                     sessionStorage.removeItem('POPUP-TASK-TAG');
                     sessionStorage.removeItem('POPUP-TASK-MODE');
-                    await openViolationStatisticsDataHtml(ExampleObject.TotalPersonnel);
                 } else {
-                    sessionStorage.setItem('POPUP-TASK-TAG', 'CONTINUE-COUNT');
                     PaginationDom[PaginationDom.length - 2].click();
+                    sessionStorage.setItem('POPUP-TASK-TAG', 'CONTINUE-COUNT');
                 }
                 break;
 

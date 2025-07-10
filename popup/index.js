@@ -43,32 +43,34 @@ const buttonExam = document.querySelectorAll('.exam-button');
 const buttonViolationStatisticsMonthly = document.getElementById('violation-statistics-button-monthly');
 const buttonViolationStatisticsCustomize = document.getElementById('violation-statistics-button-customize');
 
-buttonStartStudy.addEventListener('click', () => {
-    const selectSignup = document.querySelectorAll('.select-signup input');
-    const setTarget = document.querySelectorAll('.set-target input');
-    const floatRange = document.querySelectorAll('.float-range input');
-    const allNumber = document.querySelectorAll('.all-number input');
-    const studyVersion = document.querySelectorAll('.study-version input[name="version-radio"]:checked');
+if (buttonStartStudy) {
+    buttonStartStudy.addEventListener('click', () => {
+        const selectSignup = document.querySelectorAll('.select-signup input');
+        const setTarget = document.querySelectorAll('.set-target input');
+        const floatRange = document.querySelectorAll('.float-range input');
+        const allNumber = document.querySelectorAll('.all-number input');
+        const studyVersion = document.querySelectorAll('.study-version input[name="version-radio"]:checked');
 
-    chrome.tabs.query({ active : true, currentWindow : true }, function (tabs) {
-        chrome.tabs.sendMessage(tabs[0].id, {
-            address       : 'extensions:content',
-            action        : 'study',
-            includeSignUp : selectSignup[0].checked,
-            setTarget     : checkNumber(setTarget[0].value),
-            floatRangeMin : checkNumber(floatRange[0].value),
-            floatRangeMax : checkNumber(floatRange[1].value),
-            allNumber     : checkNumber(allNumber[0].value),
-            studyVersion  : checkNumber(studyVersion[0].value)
+        chrome.tabs.query({ active : true, currentWindow : true }, function (tabs) {
+            chrome.tabs.sendMessage(tabs[0].id, {
+                address       : 'extensions:content',
+                action        : 'study',
+                includeSignUp : selectSignup[0].checked,
+                setTarget     : checkNumber(setTarget[0].value),
+                floatRangeMin : checkNumber(floatRange[0].value),
+                floatRangeMax : checkNumber(floatRange[1].value),
+                allNumber     : checkNumber(allNumber[0].value),
+                studyVersion  : checkNumber(studyVersion[0].value)
+            });
+        });
+
+        chrome.runtime.sendMessage({
+            address      : 'extensions:background/service_worker',
+            action       : 'study',
+            studyVersion : checkNumber(studyVersion[0].value)
         });
     });
-
-    chrome.runtime.sendMessage({
-        address      : 'extensions:background/service_worker',
-        action       : 'study',
-        studyVersion : checkNumber(studyVersion[0].value)
-    });
-});
+}
 
 buttonExam.forEach((button) => {
     button.addEventListener('click', (event) => {
@@ -92,33 +94,37 @@ buttonExam.forEach((button) => {
     });
 });
 
-buttonViolationStatisticsMonthly.addEventListener('click', () => {
-    chrome.tabs.query({ active : true, currentWindow : true }, function (tabs) {
-        chrome.tabs.sendMessage(tabs[0].id, {
-            address : 'extensions:content',
+if (buttonViolationStatisticsMonthly) {
+    buttonViolationStatisticsMonthly.addEventListener('click', () => {
+        chrome.tabs.query({ active : true, currentWindow : true }, function (tabs) {
+            chrome.tabs.sendMessage(tabs[0].id, {
+                address : 'extensions:content',
+                action  : 'ViolationStatisticsMonthly'
+            });
+        });
+
+        chrome.runtime.sendMessage({
+            address : 'extensions:background/service_worker',
             action  : 'ViolationStatisticsMonthly'
         });
     });
+}
 
-    chrome.runtime.sendMessage({
-        address : 'extensions:background/service_worker',
-        action  : 'ViolationStatisticsMonthly'
-    });
-});
+if (buttonViolationStatisticsCustomize) {
+    buttonViolationStatisticsCustomize.addEventListener('click', () => {
+        chrome.tabs.query({ active : true, currentWindow : true }, function (tabs) {
+            chrome.tabs.sendMessage(tabs[0].id, {
+                address : 'extensions:content',
+                action  : 'ViolationStatisticsCustomize'
+            });
+        });
 
-buttonViolationStatisticsCustomize.addEventListener('click', () => {
-    chrome.tabs.query({ active : true, currentWindow : true }, function (tabs) {
-        chrome.tabs.sendMessage(tabs[0].id, {
-            address : 'extensions:content',
+        chrome.runtime.sendMessage({
+            address : 'extensions:background/service_worker',
             action  : 'ViolationStatisticsCustomize'
         });
     });
-
-    chrome.runtime.sendMessage({
-        address : 'extensions:background/service_worker',
-        action  : 'ViolationStatisticsCustomize'
-    });
-});
+}
 
 function checkNumber(value) {
     let tempValue = Number(value);
