@@ -1,11 +1,9 @@
-const AutoClassParam = JSON.parse(document.getElementById('__AUTO__CLASS__PARAM__').textContent);
+const AutoFullyParam = JSON.parse(document.getElementById('__AUTO__FULLY__PARAM__').textContent);
 
-if (typeof AutoStudyClass === 'function') {
-    window.AutoStudyClassExample = new AutoStudyClass(AutoClassParam);
-} else if (typeof AutoExam === 'function') {
-    window.AutoExamExample = new AutoExam(AutoClassParam);
+if (typeof AutoFullyClass === 'function') {
+    window.AutoFullyClassExample = new AutoFullyClass(AutoFullyParam);
 } else if (typeof AUTO_TPOS_VIOLATION_STATISTICS === 'function') {
-    sessionStorage.setItem('POPUP-TASK-MODE', AutoClassParam.buttonTag);
+    sessionStorage.setItem('POPUP-TASK-MODE', AutoFullyParam.buttonTag);
     sessionStorage.setItem('POPUP-TASK-TAG', 'START-COUNT');
     AUTO_TPOS_VIOLATION_STATISTICS();
 }

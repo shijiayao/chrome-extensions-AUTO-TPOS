@@ -18,62 +18,18 @@
             </div>
         </div>
 
-        <!-- 自动学习 -->
-        <div class="tabs-div auto-study">
-            <div class="input-box select-signup">
-                <span>包含报名</span>
-                <input type="checkbox" name="">
-            </div>
-            <div class="input-box set-target">
-                <span>设定目标</span>
-                <input type="number" name="" value="100" min="0">
-            </div>
-            <div class="input-box float-range">
-                <span>浮动范围</span>
-                <input type="number" name="" value="0" min="0">
-                <b class="symbol">-</b>
-                <input type="number" name="" value="5" min="0">
-            </div>
-            <div class="input-box all-number">
-                <span>全量序号</span>
-                <input type="number" name="" value="0" min="0">
-            </div>
-            <div class="input-box study-version">
-                <span>学习方式</span>
-                <label class="version-label"><input type="radio" name="version-radio" value="0" checked><span>极速版</span></label>
-                <label class="version-label"><input type="radio" name="version-radio" value="1"><span>流程版</span></label>
+        <div class="tabs-div auto-fully">
+            <div class="button-box">
+                <button id="mock-exam">模拟考试</button>
             </div>
             <div class="button-box">
-                <button id="start-study">开始学习</button>
-            </div>
-        </div>
-
-        <!-- 自动考试 -->
-        <div class="tabs-div auto-exam">
-            <div class="exam-options">
-                <div class="exam-scores">
-                    <label class="scores-label"><input type="radio" name="scores-radio" value="0"><span>全对</span></label>
-                    <label class="scores-label"><input type="radio" name="scores-radio" value="1"><span>错一题</span></label>
-                    <label class="scores-label"><input type="radio" name="scores-radio" value="2"><span>错二题</span></label>
-                    <label class="scores-label"><input type="radio" name="scores-radio" value="3"><span>错三题</span></label>
-                    <label class="scores-label"><input type="radio" name="scores-radio" value="4"><span>错四题</span></label>
-                    <label class="scores-label"><input type="radio" name="scores-radio" value="5" checked><span>随机错零到四题</span></label>
-                </div>
-            </div>
-            <div class="select-button-box">
-                <div class="button-box">
-                    <button class="exam-button" id="mock-exam">模拟考试</button>
-                </div>
-                <div class="button-box">
-                    <button class="exam-button" id="start-exam">开始考试</button>
-                </div>
+                <button id="start-auto-fully">一键开始（学习 Or 考试）</button>
             </div>
         </div>
 
         <!-- 违法数据统计 -->
         <div class="tabs-div violation-statistics">
             <div class="violation-statistics-box">
-                <!-- <button class="violation-statistics-button" id="violation-statistics-button-monthly">违法数据统计（月度）</button> -->
                 <button class="violation-statistics-button" id="violation-statistics-button-customize">违法数据统计（自定义）</button>
             </div>
         </div>

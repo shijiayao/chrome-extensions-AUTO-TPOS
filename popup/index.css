@@ -23,106 +23,18 @@
   height: 100%;
   animation: rotate 2s linear 0s infinite;
 }
-.auto-study {
+.auto-fully {
   display: none;
+  padding: 50px 0;
 }
-.auto-study .input-box {
-  margin-bottom: 10px;
-  min-height: 32px;
-  font-size: 0;
-}
-.auto-study .input-box span {
-  display: inline-block;
-  margin-right: 10px;
-  padding-top: 4px;
-  width: 100px;
-  height: 24px;
-  font-size: 20px;
-  line-height: 24px;
-  text-align: right;
-  vertical-align: top;
-}
-.auto-study .input-box input {
-  width: 180px;
-  height: 28px;
-  font-size: 24px;
-}
-.auto-study .input-box .symbol {
-  display: inline-block;
-  margin: 0 2px;
-  font-size: 20px;
-  line-height: 32px;
-  vertical-align: top;
-}
-.auto-study .select-signup input {
-  margin-top: 4px;
-  width: 24px;
-  height: 24px;
-  font-size: 0;
-  vertical-align: top;
-}
-.auto-study .float-range input {
-  width: 80px;
-}
-.auto-study .study-version .version-label {
-  display: inline-block;
-  height: 32px;
-  font-size: 20px;
-}
-.auto-study .study-version .version-label input {
-  width: 20px;
-  height: 20px;
-  vertical-align: middle;
-}
-.auto-study .study-version .version-label span {
-  width: auto;
-  margin-left: 2px;
-  vertical-align: top;
-}
-.auto-study .button-box {
+.auto-fully .button-box {
   padding-top: 10px;
   text-align: center;
 }
-.auto-study .button-box button {
-  padding: 0 20px;
-  font-size: 20px;
-  line-height: 28px;
-}
-.auto-exam {
+.auto-fully .button-box:first-child {
   display: none;
-  padding: 15px 0;
 }
-.auto-exam .exam-options {
-  padding-bottom: 10px;
-}
-.auto-exam .exam-options .exam-scores {
-  padding: 0 20px;
-}
-.auto-exam .exam-options .exam-scores .scores-label {
-  display: inline-block;
-  margin-right: 5px;
-  margin-bottom: 5px;
-  height: 32px;
-}
-.auto-exam .exam-options .exam-scores .scores-label input {
-  margin-top: 6px;
-  width: 20px;
-  height: 20px;
-  vertical-align: top;
-}
-.auto-exam .exam-options .exam-scores .scores-label span {
-  display: inline-block;
-  margin-top: 4px;
-  margin-left: 2px;
-  vertical-align: top;
-  font-size: 20px;
-  line-height: 24px;
-}
-.auto-exam .select-button-box .button-box {
-  padding-bottom: 20px;
-  text-align: center;
-}
-.auto-exam .select-button-box .button-box button {
+.auto-fully .button-box button {
   padding: 0 20px;
   font-size: 20px;
   line-height: 28px;

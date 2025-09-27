@@ -417,7 +417,7 @@ async function AUTO_TPOS_VIOLATION_STATISTICS() {
             [12, 0, 15, 0],
             [18, 0, 8, 0]
         ]; // 额外
-        const Keynote = ['4302', '4303', '4312', '4608', '4901', '4902']; // 重点
+        const Keynote = ['1360', '4302', '4303', '4312', '4608', '4901', '4902']; // 重点
 
         const dialogContainerDom = document.createElement('div');
         dialogContainerDom.id = 'dialog-container';

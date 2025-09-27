@@ -38,200 +38,106 @@ try {
     console.log(error);
 }
 
-const buttonStartStudy = document.getElementById('start-study');
-const buttonExam = document.querySelectorAll('.exam-button');
-const buttonViolationStatisticsMonthly = document.getElementById('violation-statistics-button-monthly');
-const buttonViolationStatisticsCustomize = document.getElementById('violation-statistics-button-customize');
+const ButtonStartAutoFully = document.getElementById('start-auto-fully');
+const ButtonMockExam = document.getElementById('mock-exam');
+const ButtonViolationStatisticsMonthly = document.getElementById('violation-statistics-button-monthly');
+const ButtonViolationStatisticsCustomize = document.getElementById('violation-statistics-button-customize');
 
-if (buttonStartStudy) {
-    buttonStartStudy.addEventListener('click', () => {
-        const selectSignup = document.querySelectorAll('.select-signup input');
-        const setTarget = document.querySelectorAll('.set-target input');
-        const floatRange = document.querySelectorAll('.float-range input');
-        const allNumber = document.querySelectorAll('.all-number input');
-        const studyVersion = document.querySelectorAll('.study-version input[name="version-radio"]:checked');
-
-        chrome.tabs.query({ active : true, currentWindow : true }, function (tabs) {
-            chrome.tabs.sendMessage(tabs[0].id, {
-                address       : 'extensions:content',
-                action        : 'study',
-                includeSignUp : selectSignup[0].checked,
-                setTarget     : checkNumber(setTarget[0].value),
-                floatRangeMin : checkNumber(floatRange[0].value),
-                floatRangeMax : checkNumber(floatRange[1].value),
-                allNumber     : checkNumber(allNumber[0].value),
-                studyVersion  : checkNumber(studyVersion[0].value)
-            });
-        });
-
-        chrome.runtime.sendMessage({
-            address      : 'extensions:background/service_worker',
-            action       : 'study',
-            studyVersion : checkNumber(studyVersion[0].value)
+ButtonStartAutoFully?.addEventListener('click', () => {
+    chrome.tabs.query({ active : true, currentWindow : true }, function (tabs) {
+        chrome.tabs.sendMessage(tabs[0].id, {
+            address : 'extensions:content',
+            action  : 'auto-fully'
         });
     });
-}
 
-buttonExam.forEach((button) => {
-    button.addEventListener('click', (event) => {
-        const examScores = document.querySelectorAll('.exam-scores input[name="scores-radio"]:checked');
-        const text = event.target.textContent;
-
-        chrome.tabs.query({ active : true, currentWindow : true }, function (tabs) {
-            chrome.tabs.sendMessage(tabs[0].id, {
-                address    : 'extensions:content',
-                action     : 'exam',
-                text       : text,
-                examScores : checkNumber(examScores[0].value)
-            });
-        });
-
-        chrome.runtime.sendMessage({
-            address    : 'extensions:background/service_worker',
-            action     : 'exam',
-            examScores : checkNumber(examScores[0].value)
-        });
+    chrome.runtime.sendMessage({
+        address : 'extensions:background/service_worker',
+        action  : 'auto-fully'
     });
 });
 
-if (buttonViolationStatisticsMonthly) {
-    buttonViolationStatisticsMonthly.addEventListener('click', () => {
-        chrome.tabs.query({ active : true, currentWindow : true }, function (tabs) {
-            chrome.tabs.sendMessage(tabs[0].id, {
-                address : 'extensions:content',
-                action  : 'ViolationStatisticsMonthly'
-            });
+ButtonMockExam?.addEventListener('click', () => {
+    chrome.tabs.query({ active : true, currentWindow : true }, function (tabs) {
+        chrome.tabs.sendMessage(tabs[0].id, {
+            address    : 'extensions:content',
+            action     : 'auto-fully',
+            buttonText : '模拟考试'
         });
+    });
 
-        chrome.runtime.sendMessage({
-            address : 'extensions:background/service_worker',
+    chrome.runtime.sendMessage({
+        address    : 'extensions:background/service_worker',
+        action     : 'auto-fully',
+        buttonText : '模拟考试'
+    });
+});
+
+ButtonViolationStatisticsMonthly?.addEventListener('click', () => {
+    chrome.tabs.query({ active : true, currentWindow : true }, function (tabs) {
+        chrome.tabs.sendMessage(tabs[0].id, {
+            address : 'extensions:content',
             action  : 'ViolationStatisticsMonthly'
         });
     });
-}
 
-if (buttonViolationStatisticsCustomize) {
-    buttonViolationStatisticsCustomize.addEventListener('click', () => {
-        chrome.tabs.query({ active : true, currentWindow : true }, function (tabs) {
-            chrome.tabs.sendMessage(tabs[0].id, {
-                address : 'extensions:content',
-                action  : 'ViolationStatisticsCustomize'
-            });
-        });
+    chrome.runtime.sendMessage({
+        address : 'extensions:background/service_worker',
+        action  : 'ViolationStatisticsMonthly'
+    });
+});
 
-        chrome.runtime.sendMessage({
-            address : 'extensions:background/service_worker',
+ButtonViolationStatisticsCustomize?.addEventListener('click', () => {
+    chrome.tabs.query({ active : true, currentWindow : true }, function (tabs) {
+        chrome.tabs.sendMessage(tabs[0].id, {
+            address : 'extensions:content',
             action  : 'ViolationStatisticsCustomize'
         });
     });
-}
 
-function checkNumber(value) {
-    let tempValue = Number(value);
-    if (isNaN(value)) {
-        tempValue = 0;
-    } else if (tempValue < 0) {
-        tempValue = 0;
-    }
-    return tempValue;
-}
+    chrome.runtime.sendMessage({
+        address : 'extensions:background/service_worker',
+        action  : 'ViolationStatisticsCustomize'
+    });
+});
 
 function changeUI(url) {
     const URLObject = new URL(url);
     const HrefLowercase = String(URLObject.href).toLowerCase();
     const PathnameLowercase = String(URLObject.pathname).toLowerCase();
-    const PathnameTargetList = ['/homePage', '/myClass/fromPage', '/myTrainingCourseList', '/home/courseDetail', '/exam/examDetail', '/rmweb/punishment'].map((element) => element.toLowerCase());
-    const IsOnlineSchools = URLObject.hostname.indexOf('11.33.1.253') > -1; // 网校
-    const IsViolationStatistics = PathnameLowercase.indexOf(PathnameTargetList[5]) > -1; // 违法数据
+    const PathnameTargetList = ['/homePage', '/myClass/fromPage', '/myTrainingCourseList', '/home/courseDetail', '/myExam/fromPage', '/exam/examDetail', '/rmweb/punishment'].map((element) => element.toLowerCase());
+    const IsOnlineSchools = URLObject.hostname.indexOf('11.33.1.253') > -1;
     const IsHomePage = PathnameLowercase.indexOf(PathnameTargetList[0]) === 0; // 首页
-    const IsFromPage = PathnameLowercase.indexOf(PathnameTargetList[1]) > -1; // 班级列表页
-    const IsCourseList = PathnameLowercase.indexOf(PathnameTargetList[2]) > -1; // 课程列表页
-    const IsCourseDetail = PathnameLowercase.indexOf(PathnameTargetList[3]) > -1; // 课程详情页
-    const IsExamDetail = HrefLowercase.indexOf(PathnameTargetList[4]) > -1; // 考试详情页
+    const IsStudyListLevelOne = PathnameLowercase.indexOf(PathnameTargetList[1]) > -1; // 学习一级列表页
+    const IsStudyListLevelTwo = PathnameLowercase.indexOf(PathnameTargetList[2]) > -1; // 学习二级列表页
+    const IsStudyDetail = PathnameLowercase.indexOf(PathnameTargetList[3]) > -1; // 学习课程详情页
+    const IsExamListLevelOne = PathnameLowercase.indexOf(PathnameTargetList[4]) > -1; // 考试一级列表页
+    const IsExamDetail = HrefLowercase.indexOf(PathnameTargetList[5]) > -1; // 考试详情页
+    const IsViolationStatistics = PathnameLowercase.indexOf(PathnameTargetList[6]) > -1; // 违法数据
 
     const tabsDiv = document.querySelectorAll('.tabs-div');
 
+    tabsDiv.forEach((element, index) => {
+        element.style.display = 'none';
+    });
+
     if (IsViolationStatistics) {
-        tabsDiv[0].style.display = 'none';
-        tabsDiv[1].style.display = 'none';
-        tabsDiv[2].style.display = 'none';
-        tabsDiv[3].style.display = 'initial';
+        tabsDiv[2].style.display = 'block';
     } else if (IsOnlineSchools) {
-        if (IsHomePage || IsFromPage || IsCourseList || IsCourseDetail) {
-            tabsDiv[0].style.display = 'none';
-            tabsDiv[1].style.display = 'initial';
-            tabsDiv[2].style.display = 'none';
-            tabsDiv[3].style.display = 'none';
-        } else if (IsExamDetail) {
-            tabsDiv[0].style.display = 'none';
-            tabsDiv[1].style.display = 'none';
-            tabsDiv[2].style.display = 'initial';
-            tabsDiv[3].style.display = 'none';
+        if (IsHomePage) {
+            tabsDiv[1].style.display = 'block';
+        } else if (IsStudyListLevelOne || IsStudyListLevelTwo || IsStudyDetail) {
+            tabsDiv[1].querySelectorAll('div.button-box button')[1].textContent = '一键开始（学习）';
+            tabsDiv[1].style.display = 'block';
+        } else if (IsExamListLevelOne || IsExamDetail) {
+            tabsDiv[1].querySelectorAll('div.button-box button')[1].textContent = '一键开始（考试）';
+            tabsDiv[1].style.display = 'block';
+
+            if (IsExamDetail) {
+                tabsDiv[1].querySelectorAll('div.button-box')[0].style.display = 'block';
+            }
         }
     } else {
-        tabsDiv[0].style.display = 'initial';
-        tabsDiv[1].style.display = 'none';
-        tabsDiv[2].style.display = 'none';
-        tabsDiv[3].style.display = 'none';
+        tabsDiv[0].style.display = 'block';
     }
-}
-
-/**
- * 根据参数设置选项
- * @param {object} options
- */
-function setRadio(options) {
-    if (options.studyVersion > 0) {
-        // document.querySelector(`.study-version input[name="version-radio"][value="${options.studyVersion}"]`).checked = true;
-    }
-    if (options.examScores > 0) {
-        document.querySelector(`.exam-scores input[name="scores-radio"][value="${options.examScores}"]`).checked = true;
-    }
-}
-
-function timestampSerialize(timestamp) {
-    let dateNum = 0;
-    let dateNumLength = 0;
-
-    if (!isNaN(new Date(timestamp).getTime())) {
-        // 字符串日期 或者 数字时间戳
-        dateNum = new Date(timestamp).getTime();
-    } else if (!isNaN(new Date(Number(timestamp)).getTime())) {
-        // 字符串时间戳
-        dateNum = new Date(Number(timestamp)).getTime();
-    } else {
-        return timestamp;
-    }
-
-    dateNumLength = String(dateNum).length;
-
-    if (dateNumLength < 10) {
-        // 小于 10 位数，默认不是时间戳
-        return timestamp;
-    } else if (dateNumLength < 13) {
-        // 补齐时间戳位数
-        dateNum = Number(dateNum) * Math.pow(10, 13 - dateNumLength);
-    }
-
-    let D = new Date(dateNum);
-
-    let year = D.getFullYear();
-    let month = D.getMonth() + 1;
-    let day = D.getDate();
-    let hour = D.getHours();
-    let minute = D.getMinutes();
-    let second = D.getSeconds();
-
-    let dateArr = [year, month, day];
-    let timeArr = [hour, minute, second];
-
-    for (let a = 1; a < dateArr.length; a++) {
-        dateArr[a] = String(dateArr[a])[1] ? String(dateArr[a]) : '0' + String(dateArr[a]);
-    }
-
-    for (let b = 0; b < timeArr.length; b++) {
-        timeArr[b] = String(timeArr[b])[1] ? String(timeArr[b]) : '0' + String(timeArr[b]);
-    }
-
-    return [].concat(dateArr, timeArr);
 }
