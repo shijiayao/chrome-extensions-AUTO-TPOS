@@ -5,6 +5,7 @@ class AutoFullyClass {
         this.PageTab = ''; // 页面标签
         this.HomePageArray = ['a[href="/myClass/fromPage"] .HomePage07', 'a[href="/myExam/fromPage"] .HomePage04'];
         this.HomePageIndex = 0;
+        this.NextPageWindow = null;
         this.ChildrenExample = {
             Study : {
                 ListLevelOne : null,
@@ -67,7 +68,21 @@ class AutoFullyClass {
 
     // NewClass 代码字符串
     NewClassToCodeString() {
-        return `;window.AutoStudyClassExample = new AutoFullyClass();`;
+        return `;window.AutoStudyClassExample = new AutoFullyClass(${JSON.stringify(this.options)});`;
+    }
+
+    // 注入代码
+    InjectingCode() {
+        const _this_0_ = this;
+
+        // Class 代码字符串
+        const ScriptElement_Class = _this_0_.NextPageWindow.document.createElement('script');
+        ScriptElement_Class.appendChild(document.createTextNode(_this_0_.ClassToCodeString()));
+        _this_0_.NextPageWindow.document.body.appendChild(ScriptElement_Class);
+
+        const ScriptElement_Example = _this_0_.NextPageWindow.document.createElement('script');
+        ScriptElement_Example.appendChild(document.createTextNode(_this_0_.NewClassToCodeString()));
+        _this_0_.NextPageWindow.document.body.appendChild(ScriptElement_Example);
     }
 
     AddTags() {
@@ -110,7 +125,6 @@ class AutoFullyClass {
             constructor() {
                 this.ListLevelTwoArray = []; // 学习一级列表 ID
                 this.ListLevelTwoIndex = 0;
-                this.ListLevelTwoWindow = null;
 
                 this.MessageEvent();
                 this.Init();
@@ -165,23 +179,10 @@ class AutoFullyClass {
                 }
 
                 const NewTabsWindow = window.open('/myTrainingCourseList/' + _this_1_.ListLevelTwoArray[_this_1_.ListLevelTwoIndex], '_blank');
-
-                _this_1_.ListLevelTwoWindow = NewTabsWindow;
-
+                _this_0_.NextPageWindow = NewTabsWindow;
                 NewTabsWindow.addEventListener('load', () => {
-                    _this_1_.InjectingCode();
+                    _this_0_.InjectingCode();
                 });
-            }
-
-            // 注入代码
-            InjectingCode() {
-                // Class 代码字符串
-                const ScriptElement_Class = this.ListLevelTwoWindow.document.createElement('script');
-                this.ListLevelTwoWindow.document.body.appendChild(ScriptElement_Class);
-
-                setTimeout(() => {
-                    ScriptElement_Class.appendChild(document.createTextNode(_this_0_.ClassToCodeString() + _this_0_.NewClassToCodeString()));
-                }, 2000);
             }
         }
 
@@ -189,7 +190,6 @@ class AutoFullyClass {
             constructor() {
                 this.DetailArray = [];
                 this.DetailIndex = 0;
-                this.DetailWindow = null;
 
                 this.Init();
             }
@@ -244,21 +244,11 @@ class AutoFullyClass {
                     }, 200);
                 } else {
                     const NewTabsWindow = window.open(NewTabsURL, '_blank');
-                    this.DetailWindow = NewTabsWindow;
+                    _this_0_.NextPageWindow = NewTabsWindow;
                     NewTabsWindow.addEventListener('load', () => {
-                        this.InjectingCode();
+                        _this_0_.InjectingCode();
                     });
                 }
-            }
-
-            /* 注入代码 */
-            InjectingCode() {
-                // Class 代码字符串
-                const ScriptElement_Class = this.DetailWindow.document.createElement('script');
-                this.DetailWindow.document.body.appendChild(ScriptElement_Class);
-                setTimeout(() => {
-                    ScriptElement_Class.appendChild(document.createTextNode(_this_0_.ClassToCodeString() + _this_0_.NewClassToCodeString()));
-                }, 2000);
             }
         }
 
@@ -271,7 +261,7 @@ class AutoFullyClass {
                 window.onblur = () => {};
                 window.onbeforeunload = () => {};
 
-                this.CourseList_Iterate_Play__Process();
+                this.CourseList_Iterate_Click_TopSpeed();
             }
 
             /**
@@ -354,7 +344,6 @@ class AutoFullyClass {
             constructor() {
                 this.ExamArray = []; // 考试列表
                 this.ExamIndex = 0;
-                this.DetailWindow = null;
 
                 this.Init();
             }
@@ -409,21 +398,11 @@ class AutoFullyClass {
                     }, 200);
                 } else {
                     const NewTabsWindow = window.open(NewTabsURL, '_blank');
-                    this.DetailWindow = NewTabsWindow;
+                    _this_0_.NextPageWindow = NewTabsWindow;
                     NewTabsWindow.addEventListener('load', () => {
-                        this.InjectingCode();
+                        _this_0_.InjectingCode();
                     });
                 }
-            }
-
-            /* 注入代码 */
-            InjectingCode() {
-                // Class 代码字符串
-                const ScriptElement_Class = this.DetailWindow.document.createElement('script');
-                this.DetailWindow.document.body.appendChild(ScriptElement_Class);
-                setTimeout(() => {
-                    ScriptElement_Class.appendChild(document.createTextNode(_this_0_.ClassToCodeString() + _this_0_.NewClassToCodeString()));
-                }, 2000);
             }
         }
 
@@ -442,8 +421,7 @@ class AutoFullyClass {
                     J : 9
                 };
                 this.answersArray = window.__AUTO_EXAM_ANSWERS_ARRAY__ || [];
-                this.buttonText = params.buttonText;
-                this.examScores = params.examScores;
+                this.examScores = _this_0_.RandomNumber(0, 3);
 
                 this.Init();
             }
@@ -629,10 +607,10 @@ class AutoFullyClass {
             }
         }
 
-        if (_this.PageTab === 'ExamListLevelOne') {
-            _this.ChildrenExample.Exam.ListLevelOne = new Class_ExamListLevelOne();
-        } else if (_this.PageTab === 'ExamDetail') {
-            _this.ChildrenExample.Exam.Detail = new Class_ExamDetail();
+        if (_this_0_.PageTab === 'ExamListLevelOne') {
+            _this_0_.ChildrenExample.Exam.ListLevelOne = new Class_ExamListLevelOne();
+        } else if (_this_0_.PageTab === 'ExamDetail') {
+            _this_0_.ChildrenExample.Exam.Detail = new Class_ExamDetail();
         }
     }
 }
