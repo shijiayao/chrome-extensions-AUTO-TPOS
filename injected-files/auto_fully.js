@@ -3,6 +3,7 @@ class AutoFullyClass {
         this.options = params;
         this.bc = null;
         this.PageTab = ''; // 页面标签
+        this.HomePageObject = { handler : () => { } }; // 提供给 ListLevelOne message 的处理函数
         this.HomePageArray = ['a[href="/myClass/fromPage"] .HomePage07', 'a[href="/myExam/fromPage"] .HomePage04'];
         this.HomePageIndex = 0;
         this.NextPageWindow = null;
@@ -49,15 +50,7 @@ class AutoFullyClass {
         const _this_0_ = this;
 
         _this_0_.bc.addEventListener('message', (event) => {
-            if (_this_0_.PageTab === 'HomePage') {
-                if (event.data === 'study-list-level-one-complete') {
-                    // 课程学习完成
-                    ++_this_0_.HomePageIndex;
-                    _this_0_.HomePage();
-                } else if (event.data === 'exam-list-level-one-complete') {
-                    // 考试完成
-                }
-            }
+            console.log(_this_0_.PageTab, event.data);
         });
     }
 
@@ -112,6 +105,19 @@ class AutoFullyClass {
     async HomePage() {
         const _this_0_ = this;
 
+        _this_0_.HomePageObject.handler = async () => {
+            await _this_0_.Sleep(2000);
+
+            document.querySelector('.is-link').click();
+
+            if (_this_0_.HomePageIndex < _this_0_.HomePageArray.length - 1) {
+                ++_this_0_.HomePageIndex;
+                _this_0_.HomePage();
+            } else {
+                document.body.style.backgroundColor = 'lightyellow';
+            }
+        };
+
         await _this_0_.Sleep(3000);
         document.querySelector(this.HomePageArray[this.HomePageIndex]).click();
         await _this_0_.Sleep(3000);
@@ -143,7 +149,7 @@ class AutoFullyClass {
                             _this_1_.OpenListLevelTwo();
                         } else {
                             // 所有学习一级列表都播放完了
-                            _this_0_.bc.postMessage('study-list-level-one-complete');
+                            _this_0_.HomePageObject.handler();
                         }
                     }
                 });
@@ -151,6 +157,7 @@ class AutoFullyClass {
 
             // 同步环境
             async Init() {
+                await _this_0_.Sleep(3000);
                 this.GetListLevelTwo(); // 获取报名中
                 this.ClickAfoot(); // 切换到进行中
                 await _this_0_.Sleep(3000);
@@ -175,7 +182,7 @@ class AutoFullyClass {
                 const _this_1_ = this;
 
                 if (_this_1_.ListLevelTwoArray.length <= 0) {
-                    return (document.body.style.backgroundColor = 'lime');
+                    return (document.body.style.backgroundColor = 'yellowgreen');
                 }
 
                 const NewTabsWindow = window.open('/myTrainingCourseList/' + _this_1_.ListLevelTwoArray[_this_1_.ListLevelTwoIndex], '_blank');
@@ -195,6 +202,7 @@ class AutoFullyClass {
             }
 
             async Init() {
+                await _this_0_.Sleep(5000);
                 this.MessageEvent();
                 this.GetDetailList();
                 this.OpenDetail();
@@ -222,13 +230,12 @@ class AutoFullyClass {
             }
 
             /* 打开详情页 */
-            OpenDetail() {
+            async OpenDetail() {
                 /* 所有列表都播放完了 */
                 if (this.DetailIndex >= this.DetailArray.length) {
                     _this_0_.bc.postMessage('study-list-level-two-complete');
-                    setTimeout(() => {
-                        window.close();
-                    }, 2000);
+                    await _this_0_.Sleep(200);
+                    window.close();
 
                     return;
                 }
@@ -238,10 +245,9 @@ class AutoFullyClass {
 
                 if (NewTabsStatus === '已学习') {
                     /* 已学习的跳过，继续下一个 */
-                    setTimeout(() => {
-                        ++this.DetailIndex;
-                        this.OpenDetail();
-                    }, 200);
+                    await _this_0_.Sleep(1000);
+                    ++this.DetailIndex;
+                    this.OpenDetail();
                 } else {
                     const NewTabsWindow = window.open(NewTabsURL, '_blank');
                     _this_0_.NextPageWindow = NewTabsWindow;
@@ -257,10 +263,10 @@ class AutoFullyClass {
                 this.Init();
             }
 
-            Init() {
+            async Init() {
                 window.onblur = () => {};
                 window.onbeforeunload = () => {};
-
+                await _this_0_.Sleep(5000);
                 this.CourseList_Iterate_Click_TopSpeed();
             }
 
@@ -349,6 +355,7 @@ class AutoFullyClass {
             }
 
             async Init() {
+                await _this_0_.Sleep(5000);
                 this.MessageEvent();
                 this.GetExamList();
                 this.OpenExam();
@@ -371,18 +378,17 @@ class AutoFullyClass {
             /* 考试列表 */
             GetExamList() {
                 [].forEach.call(document.querySelectorAll('#app .el-row ul.MuiList-root li.MuiListItem-root a'), (element) => {
-                    this.ExamArray.push({ url : element.getAttribute('href'), status : element.querySelector('.status').textContent });
+                    this.ExamArray.push({ url : element.getAttribute('href'), status : element.querySelector('.status-1')?.textContent });
                 });
             }
 
             /* 打开考试页 */
-            OpenExam() {
+            async OpenExam() {
                 /* 所有的考试都已完成 */
                 if (this.ExamIndex >= this.ExamArray.length) {
-                    _this_0_.bc.postMessage('exam-list-level-one-complete');
-                    setTimeout(() => {
-                        window.close();
-                    }, 2000);
+                    _this_0_.HomePageObject.handler();
+                    await _this_0_.Sleep(200);
+                    window.close();
 
                     return;
                 }
@@ -392,10 +398,9 @@ class AutoFullyClass {
 
                 if (NewTabsStatus === '已完成') {
                     /* 已考试的跳过，继续下一个 */
-                    setTimeout(() => {
-                        ++this.ExamIndex;
-                        this.OpenExam();
-                    }, 200);
+                    await _this_0_.Sleep(1000);
+                    ++this.ExamIndex;
+                    this.OpenExam();
                 } else {
                     const NewTabsWindow = window.open(NewTabsURL, '_blank');
                     _this_0_.NextPageWindow = NewTabsWindow;
@@ -427,6 +432,7 @@ class AutoFullyClass {
             }
 
             async Init() {
+                await _this_0_.Sleep(5000);
                 this.StartExam();
             }
 
@@ -603,6 +609,8 @@ class AutoFullyClass {
 
                 if (document.querySelector('#examResult .exam-result-info').textContent.includes('恭喜您成功通过考试')) {
                     _this_0_.bc.postMessage('exam-complete');
+                    await _this_0_.Sleep(200);
+                    window.close();
                 }
             }
         }
